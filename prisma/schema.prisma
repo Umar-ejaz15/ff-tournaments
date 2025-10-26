@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  coins        Int           @default(0)
+  wallet       Wallet?
+  transactions Transaction[]
+  teams        TeamMember[]
+  createdAt    DateTime      @default(now())
+  Team         Team[]
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  // Relation
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  userId      String
+  amountCoins Int
+  amountPKR   Int
+  method      String // EasyPaisa, JazzCash, Bank
+  type        String // "deposit" | "withdraw" | "entry" | "reward"
+  status      String // "pending" | "approved" | "rejected"
+  proofUrl    String?
+  createdAt   DateTime @default(now())
+
+  // Relation
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Tournament {
+  id        String   @id @default(cuid())
+  title     String
+  mode      String // Solo, Duo, Squad
+  entryFee  Int
+  prizePool Int
+  status    String   @default("upcoming") // upcoming, running, ended
+  createdAt DateTime @default(now())
+
+  winners Winner[]
+  teams   Team[]   @relation("TournamentTeams")
+}
+
+model Team {
+  id           String  @id @default(cuid())
+  name         String
+  captainId    String
+  tournamentId String?
+
+  members    TeamMember[]
+  captain    User         @relation(fields: [captainId], references: [id])
+  tournament Tournament?  @relation("TournamentTeams", fields: [tournamentId], references: [id])
+  Winner     Winner[]
+}
+
+model TeamMember {
+  id     String @id @default(cuid())
+  teamId String
+  userId String
+  role   String // captain | member
+
+  team Team @relation(fields: [teamId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Winner {
+  id           String @id @default(cuid())
+  tournamentId String
+  teamId       String
+  placement    Int
+  rewardCoins  Int
+
+  tournament Tournament @relation(fields: [tournamentId], references: [id])
+  team       Team       @relation(fields: [teamId], references: [id])
+}
