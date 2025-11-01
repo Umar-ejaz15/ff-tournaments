@@ -8,15 +8,23 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  name         String 
-  email        String        @unique
-  coins        Int           @default(0)
-  wallet       Wallet?
-  transactions Transaction[]
-  teams        TeamMember[]
-  createdAt    DateTime      @default(now())
-  Team         Team[]
+  id             String        @id @default(cuid())
+  name           String
+  email          String        @unique
+  password       String?
+  role           String        @default("user") // "user" | "admin"
+  coins          Int           @default(0)
+  createdAt      DateTime      @default(now())
+  emailVerified  DateTime?
+  image          String?
+
+  // Relations
+  wallet         Wallet?
+  transactions   Transaction[]
+  teams          TeamMember[]
+  Team           Team[]
+  accounts       Account[]
+  sessions       Session[]
 }
 
 model Wallet {
@@ -88,4 +96,43 @@ model Winner {
 
   tournament Tournament @relation(fields: [tournamentId], references: [id])
   team       Team       @relation(fields: [teamId], references: [id])
+}
+
+//
+// --- 🔐 NextAuth required models ---
+//
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
