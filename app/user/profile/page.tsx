@@ -1,10 +1,8 @@
 import { getServerSession } from "next-auth";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
-const prisma = new PrismaClient();
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
