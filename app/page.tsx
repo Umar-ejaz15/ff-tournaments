@@ -39,7 +39,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-5xl md:text-6xl font-extrabold mb-4 text-yellow-400"
+          className="text-5xl md:text-7xl font-extrabold mb-6 text-yellow-400"
         >
           Free Fire Championship 2025
         </motion.h1>
@@ -48,67 +48,111 @@ export default function LandingPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-gray-300 max-w-2xl text-lg mb-8"
+          className="text-gray-300 max-w-3xl text-xl mb-4"
         >
-          Join the ultimate Free Fire tournament. Compete with top squads,
-          dominate the leaderboard, and win real rewards.
+          Join the ultimate Free Fire tournament platform. Compete in Solo, Duo, and Squad battles.
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-gray-400 max-w-3xl text-lg mb-12"
+        >
+          Win real prizes, earn coins, and climb the leaderboard!
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex gap-4"
+          transition={{ delay: 0.5 }}
+          className="flex flex-wrap gap-4 justify-center"
         >
           <Link
-            href="/tournaments"
-            className="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl flex items-center gap-2 transition-all"
-          >
-            Join Tournament <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link
             href="/auth/login"
-            className="px-6 py-3 border border-gray-600 hover:bg-gray-800 rounded-xl transition-all"
+            className="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/40"
           >
-            Login / Signup
+            Get Started <ArrowRight className="w-5 h-5" />
           </Link>
         </motion.div>
       </section>
 
       {/* --- Features Section --- */}
       <section className="py-24 px-6 bg-gray-950 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-12 text-center">
-          <FeatureCard
-            icon={<Trophy className="w-10 h-10 text-yellow-400 mx-auto mb-4" />}
-            title="Compete & Win"
-            desc="Play Solo, Duo, or Squad tournaments and earn exciting prizes."
-          />
-          <FeatureCard
-            icon={<Users className="w-10 h-10 text-yellow-400 mx-auto mb-4" />}
-            title="Join the Community"
-            desc="Team up with skilled players and build your gaming reputation."
-          />
-          <FeatureCard
-            icon={<Coins className="w-10 h-10 text-yellow-400 mx-auto mb-4" />}
-            title="Earn Coins & Rewards"
-            desc="Collect coins after each match to redeem in tournaments or prizes."
-          />
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">
+            Why Choose FF Tournaments?
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8 text-center">
+            <FeatureCard
+              icon={<Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-4" />}
+              title="Massive Prize Pools"
+              desc="Compete for thousands of coins. Solo winners get 2500 coins, Duo teams 3200 coins, and Squad teams 3500 coins!"
+            />
+            <FeatureCard
+              icon={<Users className="w-12 h-12 text-yellow-400 mx-auto mb-4" />}
+              title="Multiple Game Modes"
+              desc="Play Solo, Duo, or Squad Battle Royale matches. More modes coming soon!"
+            />
+            <FeatureCard
+              icon={<Coins className="w-12 h-12 text-yellow-400 mx-auto mb-4" />}
+              title="Easy Coin System"
+              desc="Simple payment with EasyPaisa, JazzCash, NayaPay, or Bank Transfer. 1 coin = Rs. 4"
+            />
+          </div>
         </div>
       </section>
 
-      {/* --- Upcoming Tournament CTA --- */}
-      <section className="py-28 px-6 text-center bg-gradient-to-t from-yellow-500/10 to-transparent">
-        <h2 className="text-4xl font-bold mb-4">Ready for the next battle?</h2>
-        <p className="text-gray-400 mb-8">
-          Register now for upcoming Free Fire tournaments and showcase your
-          skills to the world.
-        </p>
-        <Link
-          href="/tournaments"
-          className="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-xl transition-all"
-        >
-          View Upcoming Tournaments
-        </Link>
+      {/* --- Prize Pool Section --- */}
+      <section className="py-24 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-8 text-yellow-400">Tournament Prize Pools</h2>
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <h3 className="text-xl font-bold text-white mb-2">Solo</h3>
+              <div className="text-3xl font-bold text-yellow-400 mb-2">5000 Coins</div>
+              <p className="text-gray-400 text-sm">Top 1: 2500 coins</p>
+              <p className="text-gray-400 text-sm">Entry: 50 coins</p>
+            </div>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <h3 className="text-xl font-bold text-white mb-2">Duo</h3>
+              <div className="text-3xl font-bold text-yellow-400 mb-2">6200 Coins</div>
+              <p className="text-gray-400 text-sm">Top 1: 3200 coins</p>
+              <p className="text-gray-400 text-sm">Entry: 100 coins</p>
+            </div>
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <h3 className="text-xl font-bold text-white mb-2">Squad</h3>
+              <div className="text-3xl font-bold text-yellow-400 mb-2">7000 Coins</div>
+              <p className="text-gray-400 text-sm">Top 1: 3500 coins</p>
+              <p className="text-gray-400 text-sm">Entry: 200 coins</p>
+            </div>
+          </div>
+          <Link
+            href="/auth/login"
+            className="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition-all inline-flex items-center gap-2 shadow-lg"
+          >
+            Get Started <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* --- Payment Methods Section --- */}
+      <section className="py-20 px-6 bg-gray-950 border-t border-gray-800">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-6 text-white">Easy Payment Options</h2>
+          <p className="text-gray-400 mb-8">
+            Support for multiple payment methods. Simply send payment, upload proof, and get verified!
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            {["EasyPaisa", "JazzCash", "NayaPay", "Bank Transfer"].map((method) => (
+              <div
+                key={method}
+                className="px-6 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white font-medium"
+              >
+                {method}
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* --- Footer --- */}

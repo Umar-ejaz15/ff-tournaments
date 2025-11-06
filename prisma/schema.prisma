@@ -12,17 +12,20 @@ model User {
   name           String
   email          String        @unique
   password       String?
-  role           String        @default("user") // "user" | "admin"
+  role           String        @default("user")
   coins          Int           @default(0)
   createdAt      DateTime      @default(now())
   emailVerified  DateTime?
   image          String?
+  wins           Int           @default(0)
+  starEligible   Boolean       @default(false)
 
-  // Relations
+  // ✅ Relations
   wallet         Wallet?
   transactions   Transaction[]
-  teams          TeamMember[]
+  teams          TeamMember[] @relation("TeamMembers")
   Team           Team[]
+  notifications  Notification[]
   accounts       Account[]
   sessions       Session[]
 }
@@ -33,7 +36,7 @@ model Wallet {
   balance   Int      @default(0)
   updatedAt DateTime @updatedAt
 
-  // Relation
+  // ✅ Back relation
   user User @relation(fields: [userId], references: [id])
 }
 
@@ -42,24 +45,30 @@ model Transaction {
   userId      String
   amountCoins Int
   amountPKR   Int
-  method      String // EasyPaisa, JazzCash, Bank
-  type        String // "deposit" | "withdraw" | "entry" | "reward"
-  status      String // "pending" | "approved" | "rejected"
+  method      String
+  type        String
+  status      String
   proofUrl    String?
   createdAt   DateTime @default(now())
 
-  // Relation
+  // ✅ Back relation
   user User @relation(fields: [userId], references: [id])
 }
 
 model Tournament {
-  id        String   @id @default(cuid())
-  title     String
-  mode      String // Solo, Duo, Squad
-  entryFee  Int
-  prizePool Int
-  status    String   @default("upcoming") // upcoming, running, ended
-  createdAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  title           String
+  mode            String
+  gameType        String   @default("BR")
+  entryFee        Int
+  prizePool       Int
+  description     String?
+  startTime       DateTime?
+  maxParticipants Int?
+  status          String   @default("upcoming")
+  createdAt       DateTime @default(now())
+  isOpen          Boolean  @default(true)
+  lobbyCode       String?
 
   winners Winner[]
   teams   Team[]   @relation("TournamentTeams")
@@ -78,13 +87,19 @@ model Team {
 }
 
 model TeamMember {
-  id     String @id @default(cuid())
-  teamId String
-  userId String
-  role   String // captain | member
+  id         String  @id @default(cuid())
+  teamId     String
+  userId     String?
+  role       String  @default("member")
 
-  team Team @relation(fields: [teamId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  // Optional guest fields
+  playerName String?
+  phone      String?
+  gameId     String?
+  email      String?
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User? @relation("TeamMembers", fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model Winner {
@@ -98,9 +113,17 @@ model Winner {
   team       Team       @relation(fields: [teamId], references: [id])
 }
 
-//
-// --- 🔐 NextAuth required models ---
-//
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  message   String
+  metadata  Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
 
 model Account {
   id                String  @id @default(cuid())
