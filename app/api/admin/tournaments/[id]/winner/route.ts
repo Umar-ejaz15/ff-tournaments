@@ -1,13 +1,13 @@
 // app/api/admin/tournaments/[id]/winner/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function POST(req: Request, context: { params?: { id?: string } }) {
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     // ✅ Parse params
-    const { id } = context.params ?? {};
-    const tournamentId = id || new URL(req.url).pathname.split("/").at(-2);
-    const { teamId } = await req.json();
+    const { id } = await context.params;
+    const tournamentId = id || new URL(request.url).pathname.split("/").at(-2);
+    const { teamId } = await request.json();
 
     // ✅ Validate IDs
     if (!tournamentId) {

@@ -1,19 +1,17 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     // Robust param extraction for dev/turbopack where params can be undefined
-    const url = new URL(req.url);
+    const url = new URL(request.url);
     const pathParts = url.pathname.split("/").filter(Boolean);
     const fallbackId = pathParts[pathParts.length - 1];
-    const id = (params as any)?.id ?? fallbackId;
+    const { id: routeParamId } = await context.params;
+    const id = routeParamId ?? fallbackId;
 
     if (!id || typeof id !== "string") {
       return NextResponse.json({ error: "Tournament id missing" }, { status: 400 });
