@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import useSWR, { mutate } from "swr";
 import type { Tournament } from "@prisma/client";
-import { Trophy, Plus, Edit, Trash2, Eye, Settings, Users as UsersIcon, Coins, Calendar } from "lucide-react";
+import { Trophy, Plus, Edit, Trash2, Eye, Settings, Users as UsersIcon, Coins, Calendar, Key } from "lucide-react";
 
 const fetcher = (url: string) =>
   fetch(url).then(async (r) => {
@@ -289,7 +289,7 @@ export default function AdminTournamentsPage() {
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
-                        <Gamepad2 className="w-4 h-4 text-blue-400" />
+                        <Key className="w-4 h-4 text-blue-400" />
                         <input
                           defaultValue={(t as any).lobbyCode || ""}
                           placeholder="Enter room code"

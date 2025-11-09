@@ -3,7 +3,7 @@
 import useSWR from "swr";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Trophy, Users, Calendar, Coins, Copy, CheckCircle, Gamepad2 } from "lucide-react";
+import { ArrowLeft, Trophy, Users, Calendar, Coins, Copy, CheckCircle, Key } from "lucide-react";
 import { useState } from "react";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -34,7 +34,7 @@ export default function TournamentDetailPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Link
           href="/user/tournaments"
-          className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 inline-block transition-colors"
+          className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Tournaments
@@ -74,7 +74,7 @@ export default function TournamentDetailPage() {
           <div className="mb-6 p-6 rounded-xl bg-gradient-to-r from-blue-900/30 to-purple-900/30 border-2 border-blue-500/50 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Gamepad2 className="w-8 h-8 text-blue-400" />
+                <Key className="w-8 h-8 text-blue-400" />
                 <div>
                   <p className="text-sm text-gray-400 mb-1">Room Code</p>
                   <p className="text-2xl font-bold text-white font-mono tracking-wider">
