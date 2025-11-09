@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 
+// Mark as dynamic since we use getServerSession which requires headers
+export const dynamic = 'force-dynamic';
+
 export default async function AdminPanal() {
   const session = await getServerSession(authOptions);
 

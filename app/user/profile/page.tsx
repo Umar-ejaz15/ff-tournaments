@@ -4,6 +4,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+// Mark as dynamic since we use getServerSession which requires headers
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
   try {
     const session = await getServerSession(authOptions);
