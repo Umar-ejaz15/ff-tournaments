@@ -19,7 +19,11 @@ export async function GET() {
         wallet: true,
         teams: {
           include: {
-            tournament: true,
+            team: {
+              include: {
+                tournament: true,
+              },
+            },
           },
         },
       },
@@ -31,11 +35,14 @@ export async function GET() {
 
     // Calculate additional stats
     const leaderboard = users.map((user) => {
-      const tournamentsPlayed = user.teams.length;
+      // Count unique tournaments the user has participated in
+      const uniqueTournaments = new Set(
+        user.teams
+          .map((teamMember) => teamMember.team?.tournament?.id)
+          .filter((id): id is string => !!id)
+      );
+      const tournamentsPlayed = uniqueTournaments.size;
       const totalCoins = user.wallet?.balance || 0;
-      
-      // Calculate total coins earned from prizes (approximate)
-      // This would ideally come from Winner records, but for now we use wallet balance
       
       return {
         user: {
