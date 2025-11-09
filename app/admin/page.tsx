@@ -15,18 +15,28 @@ export default async function AdminPanal() {
     redirect("/user");
   }
 
-  // Get stats
-  const [totalUsers, totalAdminUsers, totalTransactions, totalTournaments] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.count({ where: { role: "admin" } }),
-    prisma.transaction.count(),
-    prisma.tournament.count(),
-  ]);
+  // Get stats with error handling
+  let totalUsers = 0;
+  let totalAdminUsers = 0;
+  let totalTransactions = 0;
+  let totalTournaments = 0;
+  let pendingTransactions = 0;
 
-  // Get pending transactions count
-  const pendingTransactions = await prisma.transaction.count({
-    where: { status: "pending" },
-  });
+  try {
+    [totalUsers, totalAdminUsers, totalTransactions, totalTournaments] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({ where: { role: "admin" } }),
+      prisma.transaction.count(),
+      prisma.tournament.count(),
+    ]);
+
+    pendingTransactions = await prisma.transaction.count({
+      where: { status: "pending" },
+    });
+  } catch (prismaError) {
+    console.error("Prisma error in AdminPanel:", prismaError);
+    // Stats will show as 0, but page will still render
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-8">

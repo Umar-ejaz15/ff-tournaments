@@ -5,19 +5,37 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export default async function TransactionsPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    redirect("/auth/login");
-  }
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      redirect("/auth/login");
+    }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email! },
-    include: {
-      transactions: {
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  });
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: { email: session.user.email! },
+        include: {
+          transactions: {
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      });
+    } catch (prismaError) {
+      console.error("Prisma error in TransactionsPage:", prismaError);
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
+              <h2 className="text-xl font-bold text-red-400 mb-2">Database Connection Error</h2>
+              <p className="text-gray-300">
+                Unable to load your transactions. Please try refreshing the page.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
@@ -107,5 +125,20 @@ export default async function TransactionsPage() {
       </div>
     </div>
   );
+  } catch (error) {
+    console.error("TransactionsPage error:", error);
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
+            <h2 className="text-xl font-bold text-red-400 mb-2">Error Loading Page</h2>
+            <p className="text-gray-300">
+              An error occurred while loading this page. Please try again later.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
