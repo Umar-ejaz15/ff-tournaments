@@ -10,14 +10,14 @@ export const dynamic = 'force-dynamic';
 export default async function ProfilePage() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    if (!session?.user || !session.user.email) {
       redirect("/auth/login");
     }
 
     let user;
     try {
       user = await prisma.user.findUnique({
-        where: { email: session.user.email! },
+        where: { email: session.user.email },
         include: {
           wallet: true,
           transactions: {
@@ -26,19 +26,77 @@ export default async function ProfilePage() {
           },
         },
       });
-    } catch (prismaError) {
+    } catch (prismaError: any) {
       console.error("Prisma error in ProfilePage:", prismaError);
-      // Return a fallback UI when Prisma fails
+      console.error("Error details:", {
+        message: prismaError?.message,
+        code: prismaError?.code,
+        clientVersion: prismaError?.clientVersion,
+      });
+      
+      // Return a fallback UI with session data when Prisma fails
       return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
-              <h2 className="text-xl font-bold text-red-400 mb-2">Database Connection Error</h2>
-              <p className="text-gray-300">
-                Unable to load your profile data. Please try refreshing the page.
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-2 text-yellow-400">User Dashboard</h1>
+              <p className="text-gray-400">Welcome back, {session.user.name || session.user.email}!</p>
+            </div>
+
+            {/* Error Notice */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 mb-8">
+              <h2 className="text-xl font-bold text-yellow-400 mb-2">⚠️ Limited Functionality</h2>
+              <p className="text-gray-300 mb-2">
+                Database connection is temporarily unavailable. Some features may not work.
               </p>
-              <p className="text-sm text-gray-400 mt-2">
-                If this problem persists, please contact support.
+              <p className="text-sm text-gray-400">
+                Your session is active, but we cannot load your full profile data at this time.
+              </p>
+            </div>
+
+            {/* Basic Profile Info from Session */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                <h2 className="text-xl font-bold mb-4 text-yellow-400">Profile Information</h2>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Name:</span>
+                    <span className="text-white font-medium">{session.user.name || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Email:</span>
+                    <span className="text-white font-medium">{session.user.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Role:</span>
+                    <span className="text-white font-medium capitalize">{session.user.role || "user"}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                <h2 className="text-xl font-bold mb-4 text-yellow-400">Quick Actions</h2>
+                <div className="space-y-3">
+                  <Link
+                    href="/user/wallet"
+                    className="block w-full px-4 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg text-center transition-colors"
+                  >
+                    My Wallet
+                  </Link>
+                  <Link
+                    href="/user/tournaments"
+                    className="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-center transition-colors"
+                  >
+                    Join Tournament
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <p className="text-gray-400 text-sm">
+                Please try refreshing the page in a few moments. If the problem persists, contact support.
               </p>
             </div>
           </div>
