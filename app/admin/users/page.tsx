@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { Users, Mail, Shield, Wallet, Receipt, Trophy, Calendar, User } from "lucide-react";
 
 export default async function AdminUsersPage() {
   const session = await getServerSession(authOptions);
@@ -33,7 +34,10 @@ export default async function AdminUsersPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">All Users</h1>
+        <h1 className="text-3xl font-bold mb-6 text-yellow-400 flex items-center gap-3">
+          <Users className="w-8 h-8" />
+          All Users
+        </h1>
 
         <div className="bg-gray-900/50 border border-gray-800 rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
@@ -41,25 +45,46 @@ export default async function AdminUsersPage() {
               <thead className="bg-gray-800">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    User
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      User
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Email
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Role
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Role
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Coins
+                    <div className="flex items-center gap-2">
+                      <Wallet className="w-4 h-4" />
+                      Coins
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Teams
+                    <div className="flex items-center gap-2">
+                      <Trophy className="w-4 h-4" />
+                      Teams
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Transactions
+                    <div className="flex items-center gap-2">
+                      <Receipt className="w-4 h-4" />
+                      Transactions
+                    </div>
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                    Joined
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      Joined
+                    </div>
                   </th>
                 </tr>
               </thead>

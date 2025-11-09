@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import BuyCoinsModal from "@/app/user/components/BuyCoinsModal";
+import { Wallet, Coins, ArrowLeft, ArrowDownUp, History, Plus, CreditCard, ArrowRight } from "lucide-react";
 
 export default function WalletPage() {
   const { data: session, status } = useSession();
@@ -100,11 +101,15 @@ export default function WalletPage() {
         <div className="mb-8">
           <Link
             href="/user"
-            className="text-blue-400 hover:text-blue-300 mb-4 inline-block"
+            className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 inline-block transition-colors"
           >
-            ← Back to Dashboard
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
           </Link>
-          <h1 className="text-4xl font-bold mb-2 text-yellow-400">💰 My Wallet</h1>
+          <h1 className="text-4xl font-bold mb-2 text-yellow-400 flex items-center gap-3">
+            <Wallet className="w-8 h-8" />
+            My Wallet
+          </h1>
           <p className="text-gray-400">Manage your coins and transactions</p>
         </div>
 
@@ -112,22 +117,32 @@ export default function WalletPage() {
         <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 rounded-xl p-8 mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm mb-2">Available Balance</p>
-              <h2 className="text-5xl font-bold text-yellow-400">{walletBalance}</h2>
+              <p className="text-gray-400 text-sm mb-2 flex items-center gap-1">
+                <Wallet className="w-4 h-4" />
+                Available Balance
+              </p>
+              <h2 className="text-5xl font-bold text-yellow-400 flex items-center gap-2">
+                <Coins className="w-8 h-8" />
+                {walletBalance}
+              </h2>
               <p className="text-gray-400 text-sm mt-1">coins</p>
             </div>
             <button
               onClick={() => handleBuyCoins(200)}
-              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg transition-colors"
             >
-              + Buy Coins
+              <Plus className="w-5 h-5" />
+              Buy Coins
             </button>
           </div>
         </div>
 
         {/* Buy Coins Section */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-yellow-400">Purchase Coins</h2>
+          <h2 className="text-2xl font-bold mb-4 text-yellow-400 flex items-center gap-2">
+            <CreditCard className="w-6 h-6" />
+            Purchase Coins
+          </h2>
           <p className="text-gray-400 mb-6">
             50 coins = Rs. 200 (1 coin = Rs. 4). Upload payment proof and admin will verify it.
           </p>
@@ -173,7 +188,10 @@ export default function WalletPage() {
 
         {/* Withdraw Coins */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-yellow-400">Withdraw Coins</h2>
+          <h2 className="text-2xl font-bold mb-4 text-yellow-400 flex items-center gap-2">
+            <ArrowDownUp className="w-6 h-6" />
+            Withdraw Coins
+          </h2>
           <p className="text-gray-400 mb-6">Request a manual withdrawal. Admin will mark it paid after sending.</p>
           <form onSubmit={submitWithdrawal} className="grid gap-4 md:grid-cols-3">
             <label className="flex flex-col gap-1">
@@ -227,12 +245,16 @@ export default function WalletPage() {
         {/* Transaction History */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-yellow-400">Transaction History</h2>
+            <h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2">
+              <History className="w-6 h-6" />
+              Transaction History
+            </h2>
             <Link
               href="/user/transactions"
-              className="text-sm text-blue-400 hover:text-blue-300"
+              className="flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 transition-colors"
             >
-              View All →
+              View All
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           {transactions.length > 0 ? (

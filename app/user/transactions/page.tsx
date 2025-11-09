@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { History, ArrowLeft, Receipt, CheckCircle, XCircle, Clock, ExternalLink } from "lucide-react";
 
 // Mark as dynamic since we use getServerSession which requires headers
 export const dynamic = 'force-dynamic';
@@ -46,11 +47,15 @@ export default async function TransactionsPage() {
         <div className="mb-8">
           <Link
             href="/user"
-            className="text-blue-400 hover:text-blue-300 mb-4 inline-block"
+            className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 inline-block transition-colors"
           >
-            ← Back to Dashboard
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
           </Link>
-          <h1 className="text-4xl font-bold mb-2 text-yellow-400">Transaction History</h1>
+          <h1 className="text-4xl font-bold mb-2 text-yellow-400 flex items-center gap-3">
+            <History className="w-8 h-8" />
+            Transaction History
+          </h1>
           <p className="text-gray-400">View all your payment transactions</p>
         </div>
 
@@ -83,7 +88,7 @@ export default async function TransactionsPage() {
                       <td className="py-3 px-4 text-gray-300 text-sm">{tx.method}</td>
                       <td className="py-3 px-4">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium w-fit ${
                             tx.status === "approved"
                               ? "bg-green-500/20 text-green-400"
                               : tx.status === "rejected"
@@ -91,6 +96,13 @@ export default async function TransactionsPage() {
                               : "bg-yellow-500/20 text-yellow-400"
                           }`}
                         >
+                          {tx.status === "approved" ? (
+                            <CheckCircle className="w-3 h-3" />
+                          ) : tx.status === "rejected" ? (
+                            <XCircle className="w-3 h-3" />
+                          ) : (
+                            <Clock className="w-3 h-3" />
+                          )}
                           {tx.status}
                         </span>
                       </td>
@@ -100,8 +112,9 @@ export default async function TransactionsPage() {
                             href={tx.proofUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-400 hover:text-blue-300 text-sm"
+                            className="flex items-center gap-1 text-blue-400 hover:text-blue-300 text-sm transition-colors"
                           >
+                            <ExternalLink className="w-4 h-4" />
                             View
                           </a>
                         ) : (

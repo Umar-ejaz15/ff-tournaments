@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import TournamentJoinModal from "../components/TournamentJoinModal";
 import useSWR from "swr";
+import { Trophy, Coins, ArrowLeft, Users, Calendar, Filter } from "lucide-react";
 
 interface Tournament {
   id: string;
@@ -65,17 +66,24 @@ export default function TournamentsPage() {
         <div className="mb-8">
           <Link
             href="/user"
-            className="text-blue-400 hover:text-blue-300 mb-4 inline-block"
+            className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 inline-block transition-colors"
           >
-            ← Back to Dashboard
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold mb-2 text-yellow-400">🏆 Tournaments</h1>
+              <h1 className="text-4xl font-bold mb-2 text-yellow-400 flex items-center gap-3">
+                <Trophy className="w-8 h-8" />
+                Tournaments
+              </h1>
               <p className="text-gray-400">Join Free Fire tournaments and compete for prizes!</p>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-400">Your Balance</p>
+            <div className="text-right bg-gray-900/50 border border-gray-800 rounded-xl p-4">
+              <p className="text-sm text-gray-400 flex items-center gap-1 mb-1">
+                <Coins className="w-4 h-4" />
+                Your Balance
+              </p>
               <p className="text-2xl font-bold text-yellow-400">{walletBalance} coins</p>
             </div>
           </div>
@@ -83,6 +91,10 @@ export default function TournamentsPage() {
 
         {/* Filters */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="w-5 h-5 text-yellow-400" />
+            <h3 className="text-lg font-semibold text-white">Filters</h3>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Game Type</label>
@@ -146,18 +158,38 @@ export default function TournamentsPage() {
                 </div>
 
                 <div className="space-y-3 mb-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Entry Fee</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400 text-sm flex items-center gap-1">
+                      <Coins className="w-4 h-4" />
+                      Entry Fee
+                    </span>
                     <span className="text-yellow-400 font-semibold">{tournament.entryFee} coins</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Prize Pool</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400 text-sm flex items-center gap-1">
+                      <Trophy className="w-4 h-4" />
+                      Prize Pool
+                    </span>
                     <span className="text-green-400 font-semibold">{tournament.prizePool} coins</span>
                   </div>
                   {tournament._count && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-sm">Participants</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-sm flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        Participants
+                      </span>
                       <span className="text-white font-semibold">{tournament._count.teams}</span>
+                    </div>
+                  )}
+                  {tournament.startTime && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400 text-sm flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        Start Time
+                      </span>
+                      <span className="text-white text-sm">
+                        {new Date(tournament.startTime).toLocaleString()}
+                      </span>
                     </div>
                   )}
                 </div>

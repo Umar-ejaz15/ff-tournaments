@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { Users, UserCog, Clock, Receipt, Trophy, Settings, BarChart3 } from "lucide-react";
 
 // Mark as dynamic since we use getServerSession which requires headers
 export const dynamic = 'force-dynamic';
@@ -51,22 +52,34 @@ export default async function AdminPanal() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
-            <div className="text-gray-400 text-sm mb-1">Total Users</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-gray-400 text-sm">Total Users</div>
+              <Users className="w-5 h-5 text-blue-400" />
+            </div>
             <div className="text-3xl font-bold text-white">{totalUsers}</div>
             <div className="text-xs text-gray-500 mt-1">Registered accounts</div>
           </div>
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
-            <div className="text-gray-400 text-sm mb-1">Admin Users</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-gray-400 text-sm">Admin Users</div>
+              <UserCog className="w-5 h-5 text-yellow-400" />
+            </div>
             <div className="text-3xl font-bold text-yellow-400">{totalAdminUsers}</div>
             <div className="text-xs text-gray-500 mt-1">Administrators</div>
           </div>
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
-            <div className="text-gray-400 text-sm mb-1">Pending Payments</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-gray-400 text-sm">Pending Payments</div>
+              <Clock className="w-5 h-5 text-yellow-500" />
+            </div>
             <div className="text-3xl font-bold text-yellow-400">{pendingTransactions}</div>
             <div className="text-xs text-gray-500 mt-1">Awaiting review</div>
           </div>
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
-            <div className="text-gray-400 text-sm mb-1">Total Transactions</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-gray-400 text-sm">Total Transactions</div>
+              <Receipt className="w-5 h-5 text-green-400" />
+            </div>
             <div className="text-3xl font-bold text-white">{totalTransactions}</div>
             <div className="text-xs text-gray-500 mt-1">All time</div>
           </div>
@@ -74,61 +87,70 @@ export default async function AdminPanal() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-4 text-yellow-400">Quick Actions</h2>
+            <h2 className="text-xl font-bold mb-4 text-yellow-400 flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              Quick Actions
+            </h2>
             <div className="space-y-3">
               <Link
                 href="/admin/users"
-                className="block w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors text-center font-semibold"
+                className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-semibold"
               >
-                 Manage Users
+                <Users className="w-4 h-4" />
+                Manage Users
               </Link>
               <Link
                 href="/admin/transactions"
-                className="block w-full px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-center font-semibold"
+                className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg transition-colors font-semibold"
               >
-                 Review Payments
+                <Receipt className="w-4 h-4" />
+                Review Payments
+              </Link>
+              <Link
+                href="/admin/tournaments"
+                className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-lg transition-colors font-semibold"
+              >
+                <Trophy className="w-4 h-4" />
+                Manage Tournaments
               </Link>
             </div>
           </div>
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-4 text-yellow-400">System Info</h2>
+            <h2 className="text-xl font-bold mb-4 text-yellow-400 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              System Info
+            </h2>
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Total Users:</span>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Total Users:
+                </span>
                 <span className="text-white font-medium">{totalUsers}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Admin Users:</span>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 flex items-center gap-2">
+                  <UserCog className="w-4 h-4" />
+                  Admin Users:
+                </span>
                 <span className="text-yellow-400 font-medium">{totalAdminUsers}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Total Transactions:</span>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 flex items-center gap-2">
+                  <Receipt className="w-4 h-4" />
+                  Total Transactions:
+                </span>
                 <span className="text-white font-medium">{totalTransactions}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Tournaments:</span>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 flex items-center gap-2">
+                  <Trophy className="w-4 h-4" />
+                  Tournaments:
+                </span>
                 <span className="text-white font-medium">{totalTournaments}</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4 text-yellow-400">Coming Soon</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button
-              disabled
-              className="px-6 py-3 bg-gray-700/50 text-gray-400 rounded-lg cursor-not-allowed text-left"
-            >
-               Manage Tournaments
-            </button>
-            <button
-              disabled
-              className="px-6 py-3 bg-gray-700/50 text-gray-400 rounded-lg cursor-not-allowed text-left"
-            >
-              View Reports
-            </button>
           </div>
         </div>
       </div>

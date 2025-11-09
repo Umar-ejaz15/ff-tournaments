@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import useSWR, { mutate } from "swr";
 import type { Tournament } from "@prisma/client";
+import { Trophy, Plus, Edit, Trash2, Eye, Settings, Users as UsersIcon, Coins, Calendar } from "lucide-react";
 
 const fetcher = (url: string) =>
   fetch(url).then(async (r) => {
@@ -104,14 +105,16 @@ export default function AdminTournamentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-gray-100 p-8">
-      <h1 className="text-2xl font-semibold mb-6 border-b border-gray-800 pb-2">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-8">
+      <h1 className="text-2xl font-semibold mb-6 border-b border-gray-800 pb-2 flex items-center gap-2">
+        <Trophy className="w-6 h-6 text-yellow-400" />
         Admin Dashboard — Tournaments
       </h1>
 
       {/* Create Tournament Form */}
-      <section className="bg-neutral-900 rounded-2xl p-6 mb-8 shadow-lg">
-        <h2 className="text-lg font-medium mb-4 text-gray-200">
+      <section className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 mb-8 shadow-lg">
+        <h2 className="text-lg font-medium mb-4 text-yellow-400 flex items-center gap-2">
+          <Plus className="w-5 h-5" />
           Create New Tournament
         </h2>
         <form
@@ -121,7 +124,7 @@ export default function AdminTournamentsPage() {
           <label className="flex flex-col gap-1">
             <span className="text-sm text-gray-400">Title</span>
             <input
-              className="bg-neutral-800 p-2 rounded-lg outline-none"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg outline-none focus:border-yellow-500/50"
               placeholder="Tournament title..."
               value={form.title}
               onChange={(e) => setForm((s) => ({ ...s, title: e.target.value }))}
@@ -132,7 +135,7 @@ export default function AdminTournamentsPage() {
           <label className="flex flex-col gap-1">
             <span className="text-sm text-gray-400">Mode</span>
             <select
-              className="bg-neutral-800 p-2 rounded-lg"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
               value={form.mode}
               onChange={(e) => setForm((s) => ({ ...s, mode: e.target.value }))}
             >
@@ -145,7 +148,7 @@ export default function AdminTournamentsPage() {
           <label className="flex flex-col gap-1">
             <span className="text-sm text-gray-400">Game Type</span>
             <select
-              className="bg-neutral-800 p-2 rounded-lg"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
               value={form.gameType}
               onChange={(e) => setForm((s) => ({ ...s, gameType: e.target.value }))}
             >
@@ -158,7 +161,7 @@ export default function AdminTournamentsPage() {
             <span className="text-sm text-gray-400">Entry Fee (coins)</span>
             <input
               type="number"
-              className="bg-neutral-800 p-2 rounded-lg"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
               placeholder="e.g. 50"
               value={form.entryFee}
               onChange={(e) =>
@@ -171,7 +174,7 @@ export default function AdminTournamentsPage() {
             <span className="text-sm text-gray-400">Prize Pool (coins)</span>
             <input
               type="number"
-              className="bg-neutral-800 p-2 rounded-lg"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
               placeholder="e.g. 500"
               value={form.prizePool}
               onChange={(e) =>
@@ -184,7 +187,7 @@ export default function AdminTournamentsPage() {
             <span className="text-sm text-gray-400">Start Time</span>
             <input
               type="datetime-local"
-              className="bg-neutral-800 p-2 rounded-lg"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
               value={form.startTime}
               onChange={(e) =>
                 setForm((s) => ({ ...s, startTime: e.target.value }))
@@ -196,7 +199,7 @@ export default function AdminTournamentsPage() {
             <span className="text-sm text-gray-400">Max Participants</span>
             <input
               type="number"
-              className="bg-neutral-800 p-2 rounded-lg"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
               placeholder="e.g. 100"
               value={form.maxParticipants}
               onChange={(e) =>
@@ -209,11 +212,21 @@ export default function AdminTournamentsPage() {
             <button
               type="submit"
               disabled={busy}
-              className={`w-full ${
+              className={`flex items-center justify-center gap-2 w-full ${
                 busy ? "bg-gray-600" : "bg-green-600 hover:bg-green-700"
-              } transition rounded-lg py-2 font-semibold`}
+              } transition rounded-lg py-2 font-semibold text-white`}
             >
-              {busy ? "Creating..." : "Create Tournament"}
+              {busy ? (
+                <>
+                  <Settings className="w-4 h-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  Create Tournament
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -221,16 +234,19 @@ export default function AdminTournamentsPage() {
       </section>
 
       {/* Table */}
-      <section>
-        <h2 className="text-lg font-medium mb-4">All Tournaments</h2>
+      <section className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+        <h2 className="text-lg font-medium mb-4 text-yellow-400 flex items-center gap-2">
+          <Trophy className="w-5 h-5" />
+          All Tournaments
+        </h2>
         {isLoading && <div>Loading tournaments...</div>}
         {error && <div className="text-red-400">Failed to load tournaments.</div>}
         {!data || data.length === 0 ? (
           <div>No tournaments found.</div>
         ) : (
-          <div className="overflow-x-auto rounded-xl shadow-lg">
-            <table className="min-w-full bg-neutral-900 text-sm">
-              <thead className="bg-neutral-800 text-gray-300">
+          <div className="overflow-x-auto rounded-xl border border-gray-800 shadow-lg">
+            <table className="min-w-full bg-gray-900/50 text-sm">
+              <thead className="bg-gray-800 text-gray-300">
                 <tr>
                   <th className="p-3 text-left">Title</th>
                   <th className="p-3">Mode</th>
@@ -247,7 +263,7 @@ export default function AdminTournamentsPage() {
                 {data.map((t) => (
                   <tr
                     key={t.id}
-                    className="border-b border-neutral-800 hover:bg-neutral-800/50 transition"
+                    className="border-b border-gray-800 hover:bg-gray-800/50 transition"
                   >
                     <td className="p-3">{t.title}</td>
                     <td className="p-3">{t.mode}</td>
@@ -304,14 +320,16 @@ export default function AdminTournamentsPage() {
                       <div className="flex items-center gap-3">
                         <Link
                           href={`/admin/tournaments/${t.id}`}
-                          className="text-blue-400 hover:text-blue-300"
+                          className="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors"
                         >
+                          <Eye className="w-4 h-4" />
                           Manage
                         </Link>
                         <button
                           onClick={() => deleteTournament(t.id)}
-                          className="text-red-400 hover:text-red-500"
+                          className="flex items-center gap-1 text-red-400 hover:text-red-500 transition-colors"
                         >
+                          <Trash2 className="w-4 h-4" />
                           Delete
                         </button>
                       </div>

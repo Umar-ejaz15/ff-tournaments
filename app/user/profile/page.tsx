@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Wallet, Receipt, CheckCircle, ArrowRight, Coins, User, Mail, Calendar, Trophy } from "lucide-react";
 
 // Mark as dynamic since we use getServerSession which requires headers
 export const dynamic = 'force-dynamic';
@@ -115,18 +116,27 @@ export default async function ProfilePage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <div className="text-gray-400 text-sm mb-1">Coins Balance</div>
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-gray-400 text-sm">Coins Balance</div>
+              <Coins className="w-5 h-5 text-yellow-400" />
+            </div>
             <div className="text-3xl font-bold text-yellow-400">{user?.wallet?.balance ?? 0}</div>
             <div className="text-xs text-gray-500 mt-1">Available coins</div>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <div className="text-gray-400 text-sm mb-1">Total Transactions</div>
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-gray-400 text-sm">Total Transactions</div>
+              <Receipt className="w-5 h-5 text-blue-400" />
+            </div>
             <div className="text-3xl font-bold text-white">{user?.transactions.length ?? 0}</div>
             <div className="text-xs text-gray-500 mt-1">Payment history</div>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <div className="text-gray-400 text-sm mb-1">Account Status</div>
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-gray-400 text-sm">Account Status</div>
+              <CheckCircle className="w-5 h-5 text-green-400" />
+            </div>
             <div className="text-xl font-bold text-green-400">Active</div>
             <div className="text-xs text-gray-500 mt-1">Ready to play</div>
           </div>
@@ -135,36 +145,53 @@ export default async function ProfilePage() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <h2 className="text-xl font-bold mb-4 text-yellow-400">Quick Actions</h2>
+            <h2 className="text-xl font-bold mb-4 text-yellow-400 flex items-center gap-2">
+              <Wallet className="w-5 h-5" />
+              Quick Actions
+            </h2>
             <div className="space-y-3">
               <Link
                 href="/user/wallet"
-                className="block w-full px-4 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg text-center transition-colors"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg transition-colors"
               >
+                <Wallet className="w-4 h-4" />
                 My Wallet
               </Link>
               <Link
                 href="/user/tournaments"
-                className="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-center transition-colors"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
               >
+                <Trophy className="w-4 h-4" />
                 Join Tournament
               </Link>
             </div>
           </div>
 
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <h2 className="text-xl font-bold mb-4 text-yellow-400">Profile Information</h2>
+            <h2 className="text-xl font-bold mb-4 text-yellow-400 flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Profile Information
+            </h2>
             <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Name:</span>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Name:
+                </span>
                 <span className="text-white font-medium">{user?.name}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Email:</span>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email:
+                </span>
                 <span className="text-white font-medium">{user?.email}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Member Since:</span>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Member Since:
+                </span>
                 <span className="text-white font-medium">
                   {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
                 </span>
@@ -176,12 +203,16 @@ export default async function ProfilePage() {
         {/* Recent Transactions */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-yellow-400">Recent Transactions</h2>
+            <h2 className="text-xl font-bold text-yellow-400 flex items-center gap-2">
+              <Receipt className="w-5 h-5" />
+              Recent Transactions
+            </h2>
             <Link
               href="/user/transactions"
-              className="text-sm text-blue-400 hover:text-blue-300"
+              className="flex items-center gap-1 text-sm text-blue-400 hover:text-blue-300 transition-colors"
             >
-              View All →
+              View All
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           {user?.transactions && user.transactions.length > 0 ? (

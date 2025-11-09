@@ -4,6 +4,19 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { 
+  LayoutDashboard, 
+  Users, 
+  Receipt, 
+  Trophy, 
+  Wallet, 
+  ArrowDownUp, 
+  History,
+  ChevronDown,
+  Menu,
+  LogOut,
+  User as UserIcon
+} from "lucide-react";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -60,15 +73,16 @@ export default function Navbar() {
 
   const isAdmin = session.user.role === "admin";
 
-  const navItem = (href: string, label: string) => (
+  const navItem = (href: string, label: string, icon?: React.ReactNode) => (
     <Link
       href={href}
-      className={`block px-3 py-2 rounded-lg transition-colors ${
+      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
         pathname?.startsWith(href)
           ? "bg-gray-800 text-yellow-400"
           : "text-gray-300 hover:text-white hover:bg-gray-800"
       }`}
     >
+      {icon && <span className="w-4 h-4">{icon}</span>}
       {label}
     </Link>
   );
@@ -90,37 +104,26 @@ export default function Navbar() {
             <div className="hidden md:flex gap-6">
               {isAdmin ? (
                 <>
-                  {navItem("/admin", "Dashboard")}
-                  {navItem("/admin/users", "Users")}
-                  {navItem("/admin/transactions", "Transactions")}
-                  {navItem("/admin/tournaments", "Tournaments")}
-                  {navItem("/admin/withdrawals", "Withdrawals")}
+                  {navItem("/admin", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                  {navItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
+                  {navItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
+                  {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
+                  {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
                 </>
               ) : (
                 <>
-                  {navItem("/user", "Dashboard")}
-                  {navItem("/user/tournaments", "Tournaments")}
+                  {navItem("/user", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                  {navItem("/user/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
                   <div className="relative group">
                     <button className="px-3 py-2 rounded-lg transition-colors text-gray-300 hover:text-white hover:bg-gray-800 flex items-center gap-1">
+                      <Wallet className="w-4 h-4" />
                       Wallet
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
+                      <ChevronDown className="w-4 h-4" />
                     </button>
                     <div className="absolute top-full left-0 mt-1 w-56 bg-gray-800 border border-gray-700 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                      {navItem("/user/wallet", "💰 My Wallet")}
-                      {navItem("/user/withdrawals", "💸 Withdrawals")} {/* ✅ Added */}
-                      {navItem("/user/transactions", "📊 Transactions")}
+                      {navItem("/user/wallet", "My Wallet", <Wallet className="w-4 h-4" />)}
+                      {navItem("/user/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
+                      {navItem("/user/transactions", "Transactions", <History className="w-4 h-4" />)}
                     </div>
                   </div>
                 </>
@@ -131,6 +134,7 @@ export default function Navbar() {
           {/* Right Section */}
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-3">
+              <UserIcon className="w-5 h-5 text-gray-400" />
               <div className="text-right">
                 <p className="text-sm text-gray-300">{session.user.name}</p>
                 <p className="text-xs text-gray-500">{session.user.email}</p>
@@ -145,21 +149,9 @@ export default function Navbar() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-300 hover:text-white"
+              className="md:hidden p-2 text-gray-300 hover:text-white transition-colors"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+              <Menu className="w-6 h-6" />
             </button>
 
             {/* Logout (Desktop) */}
@@ -167,19 +159,7 @@ export default function Navbar() {
               onClick={handleLogout}
               className="hidden md:flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-gray-800 rounded-lg transition-colors"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
+              <LogOut className="w-4 h-4" />
               Logout
             </button>
           </div>
@@ -190,25 +170,26 @@ export default function Navbar() {
           <div className="md:hidden mt-2 bg-gray-800 border border-gray-700 rounded-lg p-2">
             {isAdmin ? (
               <>
-                {navItem("/admin", "Dashboard")}
-                {navItem("/admin/users", "Users")}
-                {navItem("/admin/transactions", "Transactions")}
-                {navItem("/admin/tournaments", "Tournaments")}
-                {navItem("/admin/withdrawals", "Withdrawals")}
+                {navItem("/admin", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                {navItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
+                {navItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
+                {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
+                {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
               </>
             ) : (
               <>
-                {navItem("/user", "Dashboard")}
-                {navItem("/user/tournaments", "Tournaments")}
-                {navItem("/user/wallet", "My Wallet")}
-                {navItem("/user/withdrawals", "Withdrawals")} {/* ✅ Added */}
-                {navItem("/user/transactions", "Transactions")}
+                {navItem("/user", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                {navItem("/user/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
+                {navItem("/user/wallet", "My Wallet", <Wallet className="w-4 h-4" />)}
+                {navItem("/user/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
+                {navItem("/user/transactions", "Transactions", <History className="w-4 h-4" />)}
               </>
             )}
             <button
               onClick={handleLogout}
-              className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-700 rounded mt-2"
+              className="w-full flex items-center gap-2 text-left px-3 py-2 text-sm text-red-400 hover:bg-gray-700 rounded mt-2 transition-colors"
             >
+              <LogOut className="w-4 h-4" />
               Logout
             </button>
           </div>
