@@ -29,8 +29,6 @@ model User {
   teams          TeamMember[] @relation("TeamMembers")
   Team           Team[]
   notifications  Notification[]
-  tasksCreated   Task[]        @relation("TaskCreator")
-  tasksAssigned  Task[]        @relation("TaskAssignee")
   accounts       Account[]
   sessions       Session[]
 }
@@ -163,20 +161,4 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model Task {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  status      String   @default("pending")
-  priority    String   @default("medium")
-  assignedTo  String?
-  createdBy   String
-  dueDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  creator  User  @relation("TaskCreator", fields: [createdBy], references: [id])
-  assignee User? @relation("TaskAssignee", fields: [assignedTo], references: [id], onDelete: SetNull)
 }

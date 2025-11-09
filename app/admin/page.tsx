@@ -3,7 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import { Users, UserCog, Clock, Receipt, Trophy, Settings, BarChart3, CheckSquare, TrendingUp } from "lucide-react";
+import { Users, UserCog, Clock, Receipt, Trophy, Settings, BarChart3, TrendingUp } from "lucide-react";
 
 // Mark as dynamic since we use getServerSession which requires headers
 export const dynamic = 'force-dynamic';
@@ -112,13 +112,6 @@ export default async function AdminPanal() {
               >
                 <Trophy className="w-4 h-4" />
                 Manage Tournaments
-              </Link>
-              <Link
-                href="/admin/tasks"
-                className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors font-semibold"
-              >
-                <CheckSquare className="w-4 h-4" />
-                Task Management
               </Link>
               <Link
                 href="/admin/statistics"

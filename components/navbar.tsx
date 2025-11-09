@@ -16,7 +16,6 @@ import {
   Menu,
   LogOut,
   User as UserIcon,
-  CheckSquare,
   BarChart3
 } from "lucide-react";
 import NotificationBell from "./NotificationBell";
@@ -111,7 +110,6 @@ export default function Navbar() {
                   {navItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
                   {navItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
                   {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
-                  {navItem("/admin/tasks", "Tasks", <CheckSquare className="w-4 h-4" />)}
                   {navItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
                   {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
                 </>
@@ -183,7 +181,6 @@ export default function Navbar() {
                 {navItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
                 {navItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
                 {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
-                {navItem("/admin/tasks", "Tasks", <CheckSquare className="w-4 h-4" />)}
                 {navItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
                 {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
               </>

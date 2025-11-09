@@ -12,7 +12,7 @@ export default function WalletPage() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
-  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [walletBalance, setWalletBalance] = useState<number>(0);  
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [withAmount, setWithAmount] = useState<string>("");
