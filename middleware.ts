@@ -7,6 +7,11 @@ export default withAuth(
     const isAdmin = token?.role === "admin";
     const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
 
+    // Prevent redirect loops - if we're already on login, don't redirect again
+    if (req.nextUrl.pathname === "/auth/login") {
+      return NextResponse.next();
+    }
+
     // If user tries to access admin route but is not admin
     if (isAdminRoute && !isAdmin) {
       return NextResponse.redirect(new URL("/user", req.url));
@@ -18,12 +23,17 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         // Allow access to public routes
-        const publicRoutes = ["/", "/auth/login", "/auth/error"];
+        const publicRoutes = ["/", "/auth/login", "/auth/signup", "/auth/error"];
         if (publicRoutes.includes(req.nextUrl.pathname)) {
           return true;
         }
 
         // Require authentication for protected routes
+        // But don't redirect if we're already on a public route
+        if (!token && !publicRoutes.includes(req.nextUrl.pathname)) {
+          return false; // This will trigger redirect to login
+        }
+
         return !!token;
       },
     },

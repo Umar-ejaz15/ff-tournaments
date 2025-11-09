@@ -113,15 +113,25 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger, session }) {
       // When user first signs in (for both credentials and OAuth)
       if (user) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        });
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: user.email! },
+          });
 
-        if (dbUser) {
-          token.id = dbUser.id;
-          token.role = dbUser.role.toLowerCase(); // Normalize to lowercase
-          token.email = dbUser.email;
-          token.name = dbUser.name;
+          if (dbUser) {
+            token.id = dbUser.id;
+            token.role = dbUser.role.toLowerCase(); // Normalize to lowercase
+            token.email = dbUser.email;
+            token.name = dbUser.name;
+          }
+        } catch (error) {
+          console.error("JWT callback Prisma error:", error);
+          // Use user data from the sign-in if Prisma fails
+          if (user.email) {
+            token.email = user.email;
+            token.name = user.name || "User";
+            token.role = "user"; // Default role
+          }
         }
       }
 
@@ -130,13 +140,22 @@ export const authOptions: NextAuthOptions = {
         token.role = session.role.toLowerCase();
       }
 
-      // Always ensure we have the latest role from database (normalize to lowercase)
-      if (token.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email as string },
-        });
-        if (dbUser) {
-          token.role = dbUser.role.toLowerCase();
+      // Only try to fetch from database if we don't already have a role
+      // This prevents infinite loops when Prisma is unavailable
+      if (token.email && !token.role) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: token.email as string },
+          });
+          if (dbUser) {
+            token.role = dbUser.role.toLowerCase();
+          } else {
+            token.role = "user"; // Default role if user not found
+          }
+        } catch (error) {
+          console.error("JWT callback Prisma error (role fetch):", error);
+          // Use default role if Prisma fails
+          token.role = token.role || "user";
         }
       }
 
@@ -147,9 +166,9 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.email = token.email as string;
-        session.user.name = token.name as string;
+        session.user.role = (token.role as string) || "user"; // Default to "user" if no role
+        session.user.email = (token.email as string) || session.user.email;
+        session.user.name = (token.name as string) || session.user.name;
       }
       return session;
     },
