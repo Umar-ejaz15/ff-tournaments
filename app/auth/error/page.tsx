@@ -15,8 +15,12 @@ function ErrorContent() {
         return "You do not have permission to sign in.";
       case "Verification":
         return "The verification token has expired or has already been used.";
+      case "OAuthAccountNotLinked":
+        return "An account with this email already exists. Please sign in with your original method (email/password) or use a different Google account.";
       default:
-        return "An error occurred during authentication.";
+        return error 
+          ? `An error occurred: ${error}` 
+          : "An error occurred during authentication.";
     }
   };
 

@@ -74,18 +74,23 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    // ✅ Ensure user and wallet exist
+    // ✅ Ensure user and wallet exist, handle account linking
     async signIn({ user, account, profile }) {
       try {
         if (!user.email) {
           return false;
         }
 
+        // Check if user exists
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email },
-          include: { wallet: true },
+          include: { 
+            wallet: true,
+            accounts: true 
+          },
         });
 
+        // If user doesn't exist, create new user
         if (!existingUser) {
           await prisma.user.create({
             data: {
@@ -96,16 +101,60 @@ export const authOptions: NextAuthOptions = {
               wallet: { create: { balance: 0 } },
             },
           });
-        } else if (!existingUser.wallet) {
+          return true;
+        }
+
+        // If user exists, check if account is already linked
+        if (account && account.provider) {
+          const existingAccount = await prisma.account.findFirst({
+            where: {
+              userId: existingUser.id,
+              provider: account.provider,
+              providerAccountId: account.providerAccountId,
+            },
+          });
+
+          // If account is not linked, link it now
+          if (!existingAccount && account.provider !== "credentials") {
+            await prisma.account.create({
+              data: {
+                userId: existingUser.id,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                refresh_token: account.refresh_token,
+                access_token: account.access_token,
+                expires_at: account.expires_at,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+                session_state: account.session_state,
+              },
+            });
+          }
+        }
+
+        // Ensure wallet exists
+        if (!existingUser.wallet) {
           await prisma.wallet.create({
             data: { userId: existingUser.id, balance: 0 },
+          });
+        }
+
+        // Update user image if provided and different
+        if (user.image && existingUser.image !== user.image) {
+          await prisma.user.update({
+            where: { id: existingUser.id },
+            data: { image: user.image },
           });
         }
 
         return true;
       } catch (error) {
         console.error("SignIn Error:", error);
-        return false;
+        // Don't block sign-in if it's just a linking issue
+        // The PrismaAdapter will handle account creation
+        return true;
       }
     },
 
