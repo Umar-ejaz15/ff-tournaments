@@ -50,7 +50,7 @@ export async function POST(req: Request) {
             data: {
               userId: transaction.userId,
               type: "deposit",
-              message: `✅ Deposit approved: ${transaction.amountCoins} coins added`,
+              message: `Deposit approved: ${transaction.amountCoins} coins added`,
             },
           }),
         ]);
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
             data: {
               userId: transaction.userId,
               type: "withdrawal",
-              message: `💵 Your withdrawal of Rs. ${transaction.amountPKR} has been sent.`,
+              message: `Your withdrawal of Rs. ${transaction.amountPKR} has been sent.`,
             },
           }),
         ]);

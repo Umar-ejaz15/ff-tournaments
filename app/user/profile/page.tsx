@@ -164,6 +164,13 @@ export default async function ProfilePage() {
                 <Trophy className="w-4 h-4" />
                 Join Tournament
               </Link>
+              <Link
+                href="/user/leaderboard"
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors"
+              >
+                <Trophy className="w-4 h-4" />
+                View Leaderboard
+              </Link>
             </div>
           </div>
 

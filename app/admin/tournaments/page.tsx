@@ -289,20 +289,27 @@ export default function AdminTournamentsPage() {
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
+                        <Gamepad2 className="w-4 h-4 text-blue-400" />
                         <input
                           defaultValue={(t as any).lobbyCode || ""}
-                          placeholder="Room code"
-                          className="bg-neutral-800 p-2 rounded-lg text-sm w-28"
+                          placeholder="Enter room code"
+                          className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg text-sm w-32 focus:border-yellow-500/50 focus:outline-none"
                           onBlur={async (e) => {
-                            const v = e.currentTarget.value;
-                            try {
-                              await updateTournament(t.id, { lobbyCode: v });
-                            } catch (err: any) {
-                              alert("Lobby update failed: " + err.message);
+                            const v = e.currentTarget.value.trim();
+                            if (v && v !== (t as any).lobbyCode) {
+                              try {
+                                await updateTournament(t.id, { lobbyCode: v });
+                                alert("✅ Lobby code updated! All participants will be notified via notifications.");
+                              } catch (err: any) {
+                                alert("❌ Lobby update failed: " + err.message);
+                              }
                             }
                           }}
                         />
                       </div>
+                      {(t as any).lobbyCode && (
+                        <p className="text-xs text-green-400 mt-1">Active: {(t as any).lobbyCode}</p>
+                      )}
                     </td>
                     <td className="p-3">
                       <button

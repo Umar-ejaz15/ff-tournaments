@@ -1,0 +1,60 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import prisma from "@/lib/prisma";
+
+export async function GET() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Get all users with their win counts and related data
+    const users = await prisma.user.findMany({
+      where: {
+        wins: { gt: 0 }, // Only users with at least 1 win
+      },
+      include: {
+        wallet: true,
+        teams: {
+          include: {
+            tournament: true,
+          },
+        },
+      },
+      orderBy: {
+        wins: "desc",
+      },
+      take: 100, // Top 100
+    });
+
+    // Calculate additional stats
+    const leaderboard = users.map((user) => {
+      const tournamentsPlayed = user.teams.length;
+      const totalCoins = user.wallet?.balance || 0;
+      
+      // Calculate total coins earned from prizes (approximate)
+      // This would ideally come from Winner records, but for now we use wallet balance
+      
+      return {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          wins: user.wins,
+          starEligible: user.starEligible,
+        },
+        totalWins: user.wins,
+        totalCoins,
+        tournamentsPlayed,
+      };
+    });
+
+    return NextResponse.json(leaderboard);
+  } catch (error) {
+    console.error("Error fetching leaderboard:", error);
+    return NextResponse.json({ error: "Failed to fetch leaderboard" }, { status: 500 });
+  }
+}
+

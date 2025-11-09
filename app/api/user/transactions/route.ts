@@ -46,7 +46,7 @@ export async function POST(req: Request) {
         data: {
           userId: user.id,
           type: "withdrawal",
-          message: `⏳ Withdrawal request submitted: Rs. ${amountCoins * 4} via ${method}`,
+          message: `Withdrawal request submitted: Rs. ${amountCoins * 4} via ${method}`,
           metadata: { amountCoins, method },
         },
       });

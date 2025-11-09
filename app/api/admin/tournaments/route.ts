@@ -133,20 +133,42 @@ export async function PUT(req: Request) {
     });
 
     // Fire notifications when lobby code is set or status becomes running
-    const shouldNotifyStart = (status && status === "running") || (!!updateData.lobbyCode && updateData.lobbyCode !== "");
+    const prevLobbyCode = prev?.lobbyCode || "";
+    const newLobbyCode = updateData.lobbyCode || "";
+    const lobbyCodeChanged = newLobbyCode !== "" && newLobbyCode !== prevLobbyCode;
+    const shouldNotifyStart = (status && status === "running") || lobbyCodeChanged;
+    
     if (shouldNotifyStart) {
-      const teams = await prisma.team.findMany({ where: { tournamentId: id } });
-      // Notify captains
+      const teams = await prisma.team.findMany({ 
+        where: { tournamentId: id },
+        include: { members: true }
+      });
+      
+      // Notify all team members (not just captains)
+      const allUserIds = new Set<string>();
+      teams.forEach((team) => {
+        allUserIds.add(team.captainId);
+        team.members.forEach((member) => {
+          if (member.userId) allUserIds.add(member.userId);
+        });
+      });
+
+      const tournament = await prisma.tournament.findUnique({ where: { id } });
+      
       await prisma.$transaction(
-        teams.map((t) =>
+        Array.from(allUserIds).map((userId) =>
           prisma.notification.create({
             data: {
-              userId: t.captainId,
-              type: updateData.lobbyCode ? "start" : "reminder",
-              message: updateData.lobbyCode
-                ? "🎮 Room Code available — join your Battle Royale match now!"
-                : "⚔️ Reminder: Your match starts soon. Get ready!",
-              metadata: { tournamentId: id, lobbyCode: (updateData as any).lobbyCode ?? null },
+              userId,
+              type: lobbyCodeChanged ? "start" : "reminder",
+              message: lobbyCodeChanged
+                ? `Room Code available for "${tournament?.title || "tournament"}": ${newLobbyCode} — Join now!`
+                : `Reminder: Your match "${tournament?.title || "tournament"}" starts soon. Get ready!`,
+              metadata: { 
+                tournamentId: id, 
+                lobbyCode: lobbyCodeChanged ? newLobbyCode : null,
+                tournamentTitle: tournament?.title
+              },
             },
           })
         )

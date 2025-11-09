@@ -3,16 +3,27 @@
 import useSWR from "swr";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { ArrowLeft, Trophy, Users, Calendar, Coins, Copy, CheckCircle, Gamepad2 } from "lucide-react";
+import { useState } from "react";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function TournamentDetailPage() {
   const params = useParams<{ id: string }>();
+  const [copied, setCopied] = useState(false);
   const { data, isLoading, error } = useSWR(
     params?.id ? `/api/tournaments/${params.id}` : null,
     fetcher,
     { refreshInterval: 2000, revalidateOnFocus: true, revalidateOnReconnect: true }
   );
+
+  const copyLobbyCode = () => {
+    if (data?.lobbyCode) {
+      navigator.clipboard.writeText(data.lobbyCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   if (isLoading) return <div className="p-6 text-white">Loading...</div>;
   if (error) return <div className="p-6 text-red-400">Failed to load</div>;
@@ -21,17 +32,77 @@ export default function TournamentDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <Link href="/user/tournaments" className="text-blue-400 hover:text-blue-300 mb-4 inline-block">
-          ← Back to Tournaments
+        <Link
+          href="/user/tournaments"
+          className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 inline-block transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Tournaments
         </Link>
-        <h1 className="text-3xl font-bold text-yellow-400 mb-2">{data.title}</h1>
-        <p className="text-sm text-gray-400 mb-6">
-          {data.gameType} • {data.mode} • Entry {data.entryFee} • Prize {data.prizePool}
-        </p>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-yellow-400 mb-2 flex items-center gap-3">
+            <Trophy className="w-8 h-8" />
+            {data.title}
+          </h1>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+            <span className="flex items-center gap-1">
+              <Trophy className="w-4 h-4 text-blue-400" />
+              {data.gameType}
+            </span>
+            <span className="flex items-center gap-1">
+              <Users className="w-4 h-4 text-purple-400" />
+              {data.mode}
+            </span>
+            <span className="flex items-center gap-1">
+              <Coins className="w-4 h-4 text-yellow-400" />
+              Entry: {data.entryFee} coins
+            </span>
+            <span className="flex items-center gap-1">
+              <Trophy className="w-4 h-4 text-green-400" />
+              Prize: {data.prizePool} coins
+            </span>
+            {data.startTime && (
+              <span className="flex items-center gap-1">
+                <Calendar className="w-4 h-4 text-orange-400" />
+                {new Date(data.startTime).toLocaleString()}
+              </span>
+            )}
+          </div>
+        </div>
 
         {data.lobbyCode && (
-          <div className="mb-6 p-4 rounded-lg bg-blue-900/20 border border-blue-800">
-            <p className="text-blue-300">Room Code: {data.lobbyCode}</p>
+          <div className="mb-6 p-6 rounded-xl bg-gradient-to-r from-blue-900/30 to-purple-900/30 border-2 border-blue-500/50 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Gamepad2 className="w-8 h-8 text-blue-400" />
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">Room Code</p>
+                  <p className="text-2xl font-bold text-white font-mono tracking-wider">
+                    {data.lobbyCode}
+                    <span className="ml-2 text-lg text-green-400 animate-pulse">●</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={copyLobbyCode}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">
+              ⚠️ Join the room using this code. Match will start soon!
+            </p>
           </div>
         )}
 

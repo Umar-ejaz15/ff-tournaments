@@ -137,7 +137,7 @@ export async function POST(req: Request) {
         data: {
           userId: user.id,
           type: "registration",
-          message: `✅ You have joined [${tournament.title}] successfully!`,
+          message: `You have joined "${tournament.title}" successfully!`,
           metadata: { tournamentId: tournament.id, teamId: team.id },
         },
       });

@@ -128,24 +128,24 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
               where: { id: team.captainId },
               data: { starEligible: true },
             });
-            await tx.notification.create({
-              data: {
-                userId: team.captainId,
-                type: "bonus",
-                message: "⭐ Congratulations! You've won 15 tournaments! You're now eligible for Star Friend V-Badge Prizepool!",
-              },
-            });
+                 await tx.notification.create({
+                   data: {
+                     userId: team.captainId,
+                     type: "bonus",
+                     message: "Congratulations! You've won 15 tournaments! You're now eligible for Star Friend V-Badge Prizepool!",
+                   },
+                 });
           }
         }
       }
 
       // Send prize notification
-      const placementEmoji = placement === 1 ? "🥇" : placement === 2 ? "🥈" : "🥉";
+      const placementText = placement === 1 ? "1st" : placement === 2 ? "2nd" : "3rd";
       await tx.notification.create({
         data: {
           userId: team.captainId,
           type: "prize",
-          message: `${placementEmoji} Congratulations! You placed ${placement === 1 ? "1st" : placement === 2 ? "2nd" : "3rd"} and won ${rewardCoins} coins in ${tournament.title}!`,
+          message: `Congratulations! You placed ${placementText} and won ${rewardCoins} coins in "${tournament.title}"!`,
         },
       });
     });
