@@ -86,8 +86,12 @@ export default function TournamentJoinModal({
       }
     }
 
-    if (walletBalance < tournament.entryFee) {
-      setError(`Insufficient coins. You need ${tournament.entryFee} coins.`);
+    // Calculate total entry fee (entryFee per player * team size)
+    const teamSize = tournament.mode === "Solo" ? 1 : tournament.mode === "Duo" ? 2 : 4;
+    const totalEntryFee = tournament.entryFee * teamSize;
+    
+    if (walletBalance < totalEntryFee) {
+      setError(`Insufficient coins. You need ${totalEntryFee} coins (${tournament.entryFee} per player × ${teamSize} players) for ${tournament.mode}.`);
       return;
     }
 
@@ -297,7 +301,11 @@ export default function TournamentJoinModal({
             >
               {loading
                 ? "Joining..."
-                : `Join Tournament (${tournament.entryFee * (tournament.mode === "Solo" ? 1 : tournament.mode === "Duo" ? 2 : 4)} coins)`}
+                : (() => {
+                    const teamSize = tournament.mode === "Solo" ? 1 : tournament.mode === "Duo" ? 2 : 4;
+                    const totalEntry = tournament.entryFee * teamSize;
+                    return `Join Tournament (${totalEntry} coins - ${tournament.entryFee} per player × ${teamSize})`;
+                  })()}
             </button>
             <button
               type="button"

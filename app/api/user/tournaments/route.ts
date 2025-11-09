@@ -94,13 +94,18 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
+    // Calculate total entry fee (entryFee per player * team size)
+    const totalEntryFee = tournament.entryFee * requiredSize;
+
     // Check user wallet balance
     const wallet = await prisma.wallet.findUnique({
       where: { userId: session.user.id },
     });
 
-    if (!wallet || wallet.balance < tournament.entryFee) {
-      return NextResponse.json({ error: "Insufficient balance" }, { status: 400 });
+    if (!wallet || wallet.balance < totalEntryFee) {
+      return NextResponse.json({ 
+        error: `Insufficient balance. Need ${totalEntryFee} coins (${tournament.entryFee} per player × ${requiredSize} players) for ${tournament.mode}.` 
+      }, { status: 400 });
     }
 
     // Check if user already registered
@@ -117,12 +122,12 @@ export async function POST(req: Request) {
 
     // Create team and register for tournament in a transaction
     const result = await prisma.$transaction(async (tx) => {
-      // Deduct entry fee
+      // Deduct total entry fee (entryFee per player * team size)
       await tx.wallet.update({
         where: { userId: session.user.id },
         data: {
           balance: {
-            decrement: tournament.entryFee,
+            decrement: totalEntryFee,
           },
         },
       });
@@ -131,9 +136,9 @@ export async function POST(req: Request) {
       await tx.transaction.create({
         data: {
           userId: session.user.id,
-          amountCoins: tournament.entryFee,
-          amountPKR: 0,
-          method: "wallet",
+          amountCoins: totalEntryFee,
+          amountPKR: totalEntryFee * 4, // 1 coin = Rs. 4
+          method: "SYSTEM",
           type: "entry",
           status: "approved",
         },

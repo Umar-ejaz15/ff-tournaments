@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getTotalPrizePool } from "@/lib/prize-calculator";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -58,13 +59,45 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid game type" }, { status: 400 });
     }
 
+    // Validate entry fee (should be 50 coins per player as per plan)
+    const entryFeeNum = Number(entryFee);
+    if (entryFeeNum !== 50) {
+      return NextResponse.json({ 
+        error: `Entry fee must be 50 coins per player. Current: ${entryFeeNum}` 
+      }, { status: 400 });
+    }
+
+    // Validate prize pool matches plan structure
+    const expectedPrizePool = getTotalPrizePool(
+      mode as "Solo" | "Duo" | "Squad",
+      gameType as "BR" | "CS"
+    );
+    const prizePoolNum = Number(prizePool);
+    
+    if (expectedPrizePool > 0 && prizePoolNum !== expectedPrizePool) {
+      // Get individual prize amounts for better error message
+      const prizes = {
+        "BR-Solo": { top1: 2500, top2: 1500, top3: 1000 },
+        "BR-Duo": { top1: 3200, top2: 1800, top3: 1200 },
+        "BR-Squad": { top1: 3500, top2: 2000, top3: 1500 },
+        "CS-Solo": { top1: 2500, top2: 1500, top3: 1000 },
+        "CS-Duo": { top1: 3200, top2: 1800, top3: 1200 },
+        "CS-Squad": { top1: 3500, top2: 2000, top3: 1500 },
+      };
+      const key = `${gameType}-${mode}`;
+      const prizeInfo = prizes[key as keyof typeof prizes];
+      return NextResponse.json({ 
+        error: `Prize pool for ${gameType} ${mode} should be ${expectedPrizePool} coins total (Top 1: ${prizeInfo.top1}, Top 2: ${prizeInfo.top2}, Top 3: ${prizeInfo.top3}). Current: ${prizePoolNum}` 
+      }, { status: 400 });
+    }
+
     const tournament = await prisma.tournament.create({
       data: {
         title,
         mode,
         gameType,
-        entryFee: Number(entryFee),
-        prizePool: Number(prizePool),
+        entryFee: entryFeeNum,
+        prizePool: prizePoolNum,
         description: description || "",
         startTime: startTime ? new Date(startTime) : null,
         maxParticipants: maxParticipants ? Number(maxParticipants) : null,
