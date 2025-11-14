@@ -172,6 +172,7 @@ function LoginForm() {
         >
           {isGoogleLoading ? "Redirecting..." : "Sign in with Google"}
         </button>
+        
 
         <p className="text-center text-sm text-gray-400">
           Don't have an account?{" "}
