@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Trophy, Users, Calendar, Coins, Copy, CheckCircle, Key } from "lucide-react";
 import { useState } from "react";
+import { calculatePrizeDistribution } from "@/lib/prize-distribution";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -68,6 +69,32 @@ export default function TournamentDetailPage() {
               </span>
             )}
           </div>
+          {/* Prize Distribution */}
+          {(() => {
+            const distribution = calculatePrizeDistribution(data.prizePool);
+            return (
+              <div className="mt-4 p-4 bg-gray-900/50 border border-gray-800 rounded-lg">
+                <h3 className="text-sm font-semibold text-yellow-400 mb-3">Prize Distribution</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <p className="text-xs text-gray-400 mb-1">Top 1</p>
+                    <p className="text-xl font-bold text-yellow-400">{distribution.top1}</p>
+                    <p className="text-xs text-gray-500 mt-1">({distribution.top1Percent}%)</p>
+                  </div>
+                  <div className="text-center p-3 bg-gray-500/10 border border-gray-500/30 rounded-lg">
+                    <p className="text-xs text-gray-400 mb-1">Top 2</p>
+                    <p className="text-xl font-bold text-gray-300">{distribution.top2}</p>
+                    <p className="text-xs text-gray-500 mt-1">({distribution.top2Percent}%)</p>
+                  </div>
+                  <div className="text-center p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                    <p className="text-xs text-gray-400 mb-1">Top 3</p>
+                    <p className="text-xl font-bold text-orange-400">{distribution.top3}</p>
+                    <p className="text-xs text-gray-500 mt-1">({distribution.top3Percent}%)</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {data.lobbyCode && (

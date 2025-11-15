@@ -47,10 +47,10 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       );
     }
 
-    // Calculate reward based on mode, gameType, and placement
+    // Calculate reward based on actual prize pool and placement
+    // Uses dynamic percentage-based distribution (Top 1: 55%, Top 2: 30%, Top 3: 15%)
     const rewardCoins = calculatePrizeReward(
-      tournament.mode as "Solo" | "Duo" | "Squad",
-      (tournament.gameType || "BR") as "BR" | "CS",
+      tournament.prizePool,
       placement as Placement
     );
 

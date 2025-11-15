@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { pkrToCoinsWithDiscount } from "@/lib/coins-discount";
 
 export async function POST(req: Request) {
   try {
@@ -20,8 +21,9 @@ export async function POST(req: Request) {
         { status: 400 }
       );
 
-    // PKR → Coins Conversion
-    const amountCoins = Math.floor((amountPKR / 200) * 50);
+    // PKR → Coins Conversion with Discount
+    const { baseCoins, discountPercent, discountAmount, finalCoins } = pkrToCoinsWithDiscount(amountPKR);
+    const amountCoins = finalCoins; // Use final coins with discount
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
@@ -50,6 +52,9 @@ export async function POST(req: Request) {
         id: transaction.id,
         amountPKR,
         amountCoins,
+        baseCoins,
+        discountPercent,
+        discountAmount,
         status: "pending",
       },
     });

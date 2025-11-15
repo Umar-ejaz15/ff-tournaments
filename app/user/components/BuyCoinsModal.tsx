@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { pkrToCoins } from "@/lib/coins";
+import { pkrToCoinsWithDiscount } from "@/lib/coins-discount";
+import { getAccountNumber, type PaymentMethod } from "@/lib/payment-config";
 import { useRouter } from "next/navigation";
 
 export default function BuyCoinsModal({
@@ -12,16 +13,18 @@ export default function BuyCoinsModal({
   initialAmount?: number;
 }) {
   const [pkr, setPkr] = useState<number | "">(initialAmount || "");
-  const [method, setMethod] = useState<"JazzCash" | "EasyPaisa" | "NayaPay" | "Bank">("JazzCash");
+  const [method, setMethod] = useState<PaymentMethod>("JazzCash");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofUrl, setProofUrl] = useState("");
-  const [useUrlInput, setUseUrlInput] = useState(false);   // ← FIXED
+  const [useUrlInput, setUseUrlInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const router = useRouter();
 
-  const coins = typeof pkr === "number" ? pkrToCoins(pkr) : 0;
+  const coinCalculation = typeof pkr === "number" && pkr > 0 
+    ? pkrToCoinsWithDiscount(pkr) 
+    : { baseCoins: 0, discountPercent: 0, discountAmount: 0, finalCoins: 0, pkr: 0 };
 
   // -------------------
   // Handle File Upload
@@ -81,7 +84,7 @@ export default function BuyCoinsModal({
     e.preventDefault();
     setError(null);
 
-    if (!pkr || coins <= 0) {
+    if (!pkr || coinCalculation.finalCoins <= 0) {
       setError("Please enter a valid PKR amount.");
       return;
     }
@@ -146,23 +149,49 @@ export default function BuyCoinsModal({
           />
         </label>
 
-        <p className="text-sm text-gray-600 mb-3">
-          You will receive <strong>{coins}</strong> coins (50 coins = Rs.200)
-        </p>
+        <div className="mb-3 p-3 bg-blue-50 rounded-lg">
+          <p className="text-sm text-gray-700 mb-1">
+            <strong>Base Coins:</strong> {coinCalculation.baseCoins} coins
+          </p>
+          {coinCalculation.discountPercent > 0 && (
+            <p className="text-sm text-green-600 font-semibold mb-1">
+              🎉 <strong>{coinCalculation.discountPercent}% Bonus!</strong> +{coinCalculation.discountAmount} coins
+            </p>
+          )}
+          <p className="text-sm font-bold text-gray-900">
+            Total: <strong className="text-blue-600">{coinCalculation.finalCoins} coins</strong>
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            (50 coins = Rs.200 base rate)
+          </p>
+        </div>
 
         <label className="block mb-2">
           Payment Method
           <select
             value={method}
-            onChange={(e) => setMethod(e.target.value as any)}
+            onChange={(e) => setMethod(e.target.value as PaymentMethod)}
             className="w-full border p-2 rounded mt-1"
           >
-            <option>JazzCash</option>
-            <option>EasyPaisa</option>
-            <option>NayaPay</option>
-            <option>Bank</option>
+            <option value="JazzCash">JazzCash</option>
+            <option value="EasyPaisa">EasyPaisa</option>
+            <option value="NayaPay">NayaPay</option>
+            <option value="Bank">Bank</option>
           </select>
         </label>
+
+        {/* Bank Account Details */}
+        <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-xs font-semibold text-gray-700 mb-1">
+            Send payment to {method}:
+          </p>
+          <p className="text-sm font-mono font-bold text-gray-900">
+            {getAccountNumber(method)}
+          </p>
+          <p className="text-xs text-gray-600 mt-1">
+            Upload screenshot after payment
+          </p>
+        </div>
 
         {/* PROOF SECTION */}
         <div className="mb-2">

@@ -7,6 +7,8 @@ import Link from "next/link";
 import BuyCoinsModal from "@/app/user/components/BuyCoinsModal";
 import { Wallet, Coins, ArrowLeft, ArrowDownUp, History, Plus, CreditCard, ArrowRight } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { getAllPaymentMethods } from "@/lib/payment-config";
+import { pkrToCoinsWithDiscount } from "@/lib/coins-discount";
 
 export default function WalletPage() {
   const { data: session, status } = useSession();
@@ -153,11 +155,21 @@ export default function WalletPage() {
           </p>
 
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
-            <h3 className="text-sm font-semibold text-blue-300 mb-2">Payment Instructions</h3>
-            <div className="space-y-1 text-sm text-gray-300">
+            <h3 className="text-sm font-semibold text-blue-300 mb-3">Payment Instructions</h3>
+            <div className="space-y-2 text-sm text-gray-300 mb-3">
               <p><strong className="text-blue-300">Methods:</strong> EasyPaisa / JazzCash / NayaPay / Bank Transfer</p>
               <p>After payment, upload screenshot. Admin verifies within 24 hours.</p>
-              <p>For bank details, check tournament page when joining.</p>
+            </div>
+            <div className="mt-3 pt-3 border-t border-blue-500/20">
+              <h4 className="text-xs font-semibold text-blue-300 mb-2">Account Numbers:</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                {getAllPaymentMethods().map((pm) => (
+                  <div key={pm.method} className="flex items-center justify-between">
+                    <span className="text-gray-400">{pm.name}:</span>
+                    <span className="font-mono font-bold text-yellow-400">{pm.accountNumber}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -166,28 +178,39 @@ export default function WalletPage() {
               { coins: 50, pkr: 200, label: "Starter" },
               { coins: 100, pkr: 400, label: "Popular" },
               { coins: 250, pkr: 1000, label: "Best Value" },
-            ].map((pkg, idx) => (
-              <div
-                key={pkg.coins}
-                className={`bg-gray-800/50 border rounded-xl p-4 sm:p-6 text-center ${
-                  idx === 1 ? "border-yellow-500" : "border-gray-700"
-                }`}
-              >
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-1">{pkg.coins} Coins</h3>
-                <p className="text-gray-400 text-xs mb-2">{pkg.label}</p>
-                <p className="text-xl sm:text-2xl font-bold text-yellow-400 mb-4">Rs. {pkg.pkr}</p>
-                <button
-                  onClick={() => handleBuyCoins(pkg.pkr)}
-                  className={`w-full py-2 rounded-lg font-semibold text-sm sm:text-base transition-colors ${
-                    idx === 1
-                      ? "bg-yellow-500 hover:bg-yellow-400 text-black"
-                      : "bg-gray-700 hover:bg-gray-600 text-white"
+            ].map((pkg, idx) => {
+              const calc = pkrToCoinsWithDiscount(pkg.pkr);
+              return (
+                <div
+                  key={pkg.coins}
+                  className={`bg-gray-800/50 border rounded-xl p-4 sm:p-6 text-center ${
+                    idx === 1 ? "border-yellow-500" : "border-gray-700"
                   }`}
                 >
-                  Buy Now
-                </button>
-              </div>
-            ))}
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-1">
+                    {calc.finalCoins} Coins
+                    {calc.discountPercent > 0 && (
+                      <span className="text-xs text-green-400 ml-2">+{calc.discountPercent}%</span>
+                    )}
+                  </h3>
+                  <p className="text-gray-400 text-xs mb-1">{pkg.label}</p>
+                  {calc.discountPercent > 0 && (
+                    <p className="text-xs text-gray-500 line-through mb-1">{calc.baseCoins} base</p>
+                  )}
+                  <p className="text-xl sm:text-2xl font-bold text-yellow-400 mb-4">Rs. {pkg.pkr}</p>
+                  <button
+                    onClick={() => handleBuyCoins(pkg.pkr)}
+                    className={`w-full py-2 rounded-lg font-semibold text-sm sm:text-base transition-colors ${
+                      idx === 1
+                        ? "bg-yellow-500 hover:bg-yellow-400 text-black"
+                        : "bg-gray-700 hover:bg-gray-600 text-white"
+                    }`}
+                  >
+                    Buy Now
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
 

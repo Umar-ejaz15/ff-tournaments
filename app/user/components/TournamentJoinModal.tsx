@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { calculatePrizeDistribution } from "@/lib/prize-distribution";
 
 interface TeamMember {
   playerName: string;
@@ -158,6 +159,32 @@ export default function TournamentJoinModal({
               <span className="text-green-400 ml-2 font-semibold">{tournament.prizePool} coins</span>
             </div>
           </div>
+          {/* Prize Distribution */}
+          {(() => {
+            const distribution = calculatePrizeDistribution(tournament.prizePool);
+            return (
+              <div className="mt-3 pt-3 border-t border-gray-700">
+                <p className="text-xs text-gray-400 mb-2">Prize Distribution:</p>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="text-center p-2 bg-yellow-500/10 rounded">
+                    <p className="text-yellow-400 font-semibold">Top 1</p>
+                    <p className="text-white">{distribution.top1}</p>
+                    <p className="text-gray-500">({distribution.top1Percent}%)</p>
+                  </div>
+                  <div className="text-center p-2 bg-gray-500/10 rounded">
+                    <p className="text-gray-300 font-semibold">Top 2</p>
+                    <p className="text-white">{distribution.top2}</p>
+                    <p className="text-gray-500">({distribution.top2Percent}%)</p>
+                  </div>
+                  <div className="text-center p-2 bg-orange-500/10 rounded">
+                    <p className="text-orange-400 font-semibold">Top 3</p>
+                    <p className="text-white">{distribution.top3}</p>
+                    <p className="text-gray-500">({distribution.top3Percent}%)</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         <form onSubmit={handleSubmit}>

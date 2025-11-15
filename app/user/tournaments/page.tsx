@@ -8,6 +8,7 @@ import TournamentJoinModal from "../components/TournamentJoinModal";
 import useSWR from "swr";
 import { Trophy, Coins, ArrowLeft, Users, Calendar, Filter } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { calculatePrizeDistribution } from "@/lib/prize-distribution";
 
 interface Tournament {
   id: string;
@@ -180,6 +181,32 @@ export default function TournamentsPage() {
                     </span>
                     <span className="text-green-400 font-semibold text-xs sm:text-sm">{tournament.prizePool} coins</span>
                   </div>
+                  {/* Prize Distribution */}
+                  {(() => {
+                    const distribution = calculatePrizeDistribution(tournament.prizePool);
+                    return (
+                      <div className="mt-2 pt-2 border-t border-gray-700">
+                        <p className="text-xs text-gray-500 mb-1">Prize Distribution:</p>
+                        <div className="grid grid-cols-3 gap-1 text-xs">
+                          <div className="text-center">
+                            <span className="text-yellow-400 font-semibold">Top 1</span>
+                            <p className="text-gray-400">{distribution.top1}</p>
+                            <p className="text-gray-500">({distribution.top1Percent}%)</p>
+                          </div>
+                          <div className="text-center">
+                            <span className="text-gray-300 font-semibold">Top 2</span>
+                            <p className="text-gray-400">{distribution.top2}</p>
+                            <p className="text-gray-500">({distribution.top2Percent}%)</p>
+                          </div>
+                          <div className="text-center">
+                            <span className="text-orange-400 font-semibold">Top 3</span>
+                            <p className="text-gray-400">{distribution.top3}</p>
+                            <p className="text-gray-500">({distribution.top3Percent}%)</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {tournament._count && (
                     <>
                       <div className="flex items-center justify-between gap-2">
