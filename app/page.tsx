@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function LandingPage() {
   const { data: session, status } = useSession();
@@ -24,11 +25,7 @@ export default function LandingPage() {
 
   // Show loading while checking session
   if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading..." />;
   }
 
   return (
