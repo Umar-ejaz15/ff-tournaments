@@ -22,3 +22,27 @@ GOOGLE_CLIENT_SECRET="your-google-client-secret"
 # Node Environment
 NODE_ENV="development"
 
+# Push Notifications (VAPID Keys)
+# Generate keys: node scripts/generate-vapid-keys.js
+# Or: npm install -g web-push && web-push generate-vapid-keys
+NEXT_PUBLIC_VAPID_PUBLIC_KEY="your-vapid-public-key-here"
+VAPID_PRIVATE_KEY="your-vapid-private-key-here"
+VAPID_EMAIL="mailto:your-email@example.com"
+
+# WhatsApp Bot Configuration
+# Provider: 'twilio' or 'whatsapp-business'
+WHATSAPP_PROVIDER="twilio"
+
+# Twilio WhatsApp API (if using Twilio)
+TWILIO_ACCOUNT_SID="your-twilio-account-sid"
+TWILIO_AUTH_TOKEN="your-twilio-auth-token"
+TWILIO_WHATSAPP_NUMBER="whatsapp:+14155238886"
+
+# WhatsApp Business API (if using WhatsApp Business)
+WHATSAPP_BUSINESS_TOKEN="your-whatsapp-business-token"
+WHATSAPP_BUSINESS_PHONE_ID="your-phone-number-id"
+
+# Cron Job Secret (for match reminders)
+# Generate a random secret: openssl rand -base64 32
+CRON_SECRET="your-random-secret-key-here"
+

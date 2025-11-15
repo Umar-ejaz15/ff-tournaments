@@ -9,6 +9,8 @@ import { Wallet, Coins, ArrowLeft, ArrowDownUp, History, Plus, CreditCard, Arrow
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { getAllPaymentMethods } from "@/lib/payment-config";
 import { pkrToCoinsWithDiscount } from "@/lib/coins-discount";
+import PushNotificationSetup from "../components/PushNotificationSetup";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 export default function WalletPage() {
   const { data: session, status } = useSession();
@@ -271,6 +273,11 @@ export default function WalletPage() {
           </form>
         </div>
 
+        {/* Push Notifications Setup */}
+        <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 sm:p-6 mb-8">
+          <PushNotificationSetup />
+        </div>
+
         {/* Transaction History */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
@@ -349,6 +356,8 @@ export default function WalletPage() {
           }}
         />
       )}
+
+      <PWAInstallPrompt />
     </div>
   );
 }

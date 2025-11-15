@@ -6,6 +6,12 @@
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/match-reminders",
+      "schedule": "*/10 * * * *"
+    }
+  ]
 }
 
