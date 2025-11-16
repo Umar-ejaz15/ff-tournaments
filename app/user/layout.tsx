@@ -40,9 +40,10 @@ export default async function UserLayout({ children }: { children: React.ReactNo
     redirect("/auth/signup");
   }
 
-  // Extra safety: if user role in DB is not "user", show loading/error
+  // Extra safety: if user role in DB is not "user", redirect to admin
+  // This prevents any admin account data from rendering under /user routes.
   if (user.role !== "user") {
-    return <LoadingSpinner message="Verifying your access..." />;
+    redirect("/admin");
   }
 
   return (

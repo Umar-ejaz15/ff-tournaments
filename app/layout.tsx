@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import Navbar from "@/components/navbar";
 import ServiceWorkerRegistration from "@/app/components/ServiceWorkerRegistration";
+import SessionGuard from "@/components/SessionGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,8 +41,10 @@ export default function RootLayout({
       >
         <Providers>
           <ServiceWorkerRegistration />
-          <Navbar />
-          {children}
+          <SessionGuard>
+            <Navbar />
+            {children}
+          </SessionGuard>
         </Providers>
       </body>
     </html>

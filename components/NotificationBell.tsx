@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Bell, Check, X } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import useSWR from "swr";
 
@@ -19,11 +20,15 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function NotificationBell() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
+
+  // Only fetch user notifications when on user routes and session role is 'user'
+  const shouldFetch = status === "authenticated" && pathname?.startsWith("/user") && session?.user?.role === "user";
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const { data: notifications = [], mutate } = useSWR<Notification[]>(
-    status === "authenticated" ? "/api/user/notifications" : null,
+    shouldFetch ? "/api/user/notifications" : null,
     fetcher,
     { refreshInterval: 3000, revalidateOnFocus: true }
   );
@@ -66,7 +71,8 @@ export default function NotificationBell() {
     }
   }
 
-  if (status !== "authenticated" || !session) return null;
+  // If not authenticated, or we're not on a user route for a user role, hide the bell.
+  if (!shouldFetch || status !== "authenticated" || !session) return null;
 
   return (
     <div className="relative" ref={dropdownRef}>

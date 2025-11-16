@@ -83,14 +83,23 @@ export default function Navbar() {
     );
   }
 
-  const isAdmin = session.user.role === "admin";
-
-  // Determine if the current path doesn't match the user's role (transient mismatch)
+  // Determine current route area
   const userOnUserPath = pathname?.startsWith("/user");
   const userOnAdminPath = pathname?.startsWith("/admin");
+
+  // Only trust session role after authentication completes
+  const isAdmin = status === "authenticated" && session?.user?.role === "admin";
+
+  // Transient mismatch when auth is done but the role doesn't match the current area
   const roleMismatch =
     status === "authenticated" &&
     ((userOnUserPath && session?.user?.role !== "user") || (userOnAdminPath && session?.user?.role !== "admin"));
+
+  // Only display name/email/admin badge when authentication is complete and
+  // the session role matches the current route area (or the route is neutral)
+  const canShowSessionInfo =
+    status === "authenticated" &&
+    ((userOnUserPath && session?.user?.role === "user") || (userOnAdminPath && session?.user?.role === "admin") || (!userOnUserPath && !userOnAdminPath));
 
   const navItem = (href: string, label: string, icon?: React.ReactNode) => (
     <Link
@@ -158,7 +167,7 @@ export default function Navbar() {
             <NotificationBell />
 
             <div className="hidden md:flex items-center gap-3">
-              {roleMismatch ? (
+              {roleMismatch || !canShowSessionInfo ? (
                 <div className="text-right">
                   <p className="text-sm text-gray-300">Verifying access...</p>
                 </div>
@@ -166,8 +175,8 @@ export default function Navbar() {
                 <>
                   <UserIcon className="w-5 h-5 text-gray-400" />
                   <div className="text-right">
-                    <p className="text-sm text-gray-300">{session.user.name}</p>
-                    <p className="text-xs text-gray-500">{session.user.email}</p>
+                    <p className="text-sm text-gray-300">{session?.user?.name}</p>
+                    <p className="text-xs text-gray-500">{session?.user?.email}</p>
                   </div>
                   {isAdmin && (
                     <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs font-medium">
