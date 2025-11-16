@@ -31,10 +31,16 @@ export default function PushNotificationSetup() {
 
   async function checkSubscriptionStatus() {
     try {
-      const registration = await registerServiceWorker();
-      if (registration) {
-        const subscription = await getPushSubscription(registration);
-        setIsSubscribed(!!subscription);
+      // Wait for service worker to be ready
+      if ('serviceWorker' in navigator) {
+        await navigator.serviceWorker.ready;
+        
+        // Get existing registration
+        const registration = await navigator.serviceWorker.getRegistration('/');
+        if (registration) {
+          const subscription = await getPushSubscription(registration);
+          setIsSubscribed(!!subscription);
+        }
       }
     } catch (error) {
       console.error("Error checking subscription:", error);
@@ -46,7 +52,15 @@ export default function PushNotificationSetup() {
     setMessage(null);
 
     try {
-      // Request permission
+      // Check VAPID key is available
+      const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidKey) {
+        setMessage("Push notifications are not configured. Please contact the administrator.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Request permission first
       const hasPermission = await requestNotificationPermission();
       if (!hasPermission) {
         setMessage("Notification permission denied. Please enable it in your browser settings.");
@@ -54,10 +68,15 @@ export default function PushNotificationSetup() {
         return;
       }
 
-      // Register service worker
+      // Wait for service worker to be ready (ServiceWorkerRegistration component handles registration)
+      if ('serviceWorker' in navigator) {
+        await navigator.serviceWorker.ready;
+      }
+
+      // Get or register service worker
       const registration = await registerServiceWorker();
       if (!registration) {
-        setMessage("Failed to register service worker.");
+        setMessage("Failed to get service worker. Please refresh the page and try again.");
         setIsLoading(false);
         return;
       }
@@ -65,27 +84,82 @@ export default function PushNotificationSetup() {
       // Subscribe to push
       const subscription = await subscribeToPush(registration);
       if (!subscription) {
-        setMessage("Failed to subscribe to push notifications.");
+        setMessage("Failed to subscribe to push notifications. Please try again.");
         setIsLoading(false);
         return;
+      }
+
+      // Convert subscription to JSON format for server
+      // The subscription object needs to be converted to a format the server can use
+      let subscriptionJson;
+      try {
+        const p256dhKey = subscription.getKey('p256dh');
+        const authKey = subscription.getKey('auth');
+
+        if (!p256dhKey || !authKey) {
+          throw new Error("Subscription keys are missing");
+        }
+
+        // Convert ArrayBuffer to base64url format
+        const base64UrlEncode = (buffer: ArrayBuffer): string => {
+          const bytes = new Uint8Array(buffer);
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          return btoa(binary)
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=/g, '');
+        };
+
+        subscriptionJson = {
+          endpoint: subscription.endpoint,
+          keys: {
+            p256dh: base64UrlEncode(p256dhKey),
+            auth: base64UrlEncode(authKey),
+          },
+        };
+
+        console.log('Subscription prepared for server:', {
+          hasEndpoint: !!subscriptionJson.endpoint,
+          hasP256dh: !!subscriptionJson.keys.p256dh,
+          hasAuth: !!subscriptionJson.keys.auth,
+        });
+      } catch (conversionError: any) {
+        console.error('Failed to convert subscription:', conversionError);
+        throw new Error("Failed to prepare subscription data: " + (conversionError.message || "Unknown error"));
       }
 
       // Send subscription to server
       const response = await fetch("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscription }),
+        body: JSON.stringify({ subscription: subscriptionJson }),
       });
 
+      const responseData = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        throw new Error("Failed to save subscription");
+        console.error('Subscription API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: responseData,
+        });
+        throw new Error(responseData.error || responseData.details || "Failed to save subscription");
       }
 
       setIsSubscribed(true);
       setMessage("Successfully subscribed to push notifications!");
     } catch (error: any) {
       console.error("Subscribe error:", error);
-      setMessage(error.message || "Failed to enable notifications.");
+      const errorMessage = error.message || "Failed to enable notifications. Please try again.";
+      console.error("Full error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+      setMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -96,17 +170,43 @@ export default function PushNotificationSetup() {
     setMessage(null);
 
     try {
-      const registration = await navigator.serviceWorker.ready;
+      // Wait for service worker to be ready
+      if ('serviceWorker' in navigator) {
+        await navigator.serviceWorker.ready;
+      }
+
+      const registration = await navigator.serviceWorker.getRegistration('/');
+      if (!registration) {
+        setMessage("Service worker not found. You may already be unsubscribed.");
+        setIsSubscribed(false);
+        setIsLoading(false);
+        return;
+      }
+
       const subscription = await getPushSubscription(registration);
 
       if (subscription) {
-        await unsubscribeFromPush(subscription);
+        const unsubscribed = await unsubscribeFromPush(subscription);
+        if (!unsubscribed) {
+          throw new Error("Failed to unsubscribe from push service");
+        }
 
         // Remove from server
-        await fetch("/api/push/subscribe", {
+        const response = await fetch("/api/push/subscribe", {
           method: "DELETE",
         });
 
+        if (!response.ok) {
+          console.warn("Failed to remove subscription from server, but unsubscribed locally");
+        }
+
+        setIsSubscribed(false);
+        setMessage("Successfully unsubscribed from push notifications.");
+      } else {
+        // Already unsubscribed locally, just remove from server
+        await fetch("/api/push/subscribe", {
+          method: "DELETE",
+        });
         setIsSubscribed(false);
         setMessage("Successfully unsubscribed from push notifications.");
       }

@@ -61,16 +61,37 @@ self.addEventListener('activate', (event) => {
 
 // Push notification event
 self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {};
+  let data = {};
+  
+  try {
+    if (event.data) {
+      data = event.data.json();
+    }
+  } catch (error) {
+    console.error('Failed to parse push notification data:', error);
+    // Fallback to text if JSON parsing fails
+    if (event.data) {
+      data = { body: event.data.text() || 'You have a new notification' };
+    }
+  }
+
   const title = data.title || 'FF Tournaments';
+  const url = data.url || data.data?.url || '/';
+  
   const options = {
     body: data.body || 'You have a new notification',
     icon: data.icon || '/favicon.ico',
     badge: data.badge || '/favicon.ico',
     tag: data.tag || 'notification',
-    data: data.url || '/',
+    data: {
+      url: url,
+      tournamentId: data.data?.tournamentId || null,
+      ...data.data
+    },
     requireInteraction: false,
-    actions: data.actions || []
+    actions: data.actions || [],
+    vibrate: [200, 100, 200], // Vibration pattern for mobile devices
+    timestamp: Date.now()
   };
 
   event.waitUntil(
@@ -82,24 +103,37 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  const urlToOpen = event.notification.data || '/';
+  // Get URL from notification data
+  let urlToOpen = '/';
+  if (typeof event.notification.data === 'string') {
+    urlToOpen = event.notification.data;
+  } else if (event.notification.data && event.notification.data.url) {
+    urlToOpen = event.notification.data.url;
+  }
 
   event.waitUntil(
     clients.matchAll({
       type: 'window',
       includeUncontrolled: true
     }).then((clientList) => {
-      // Check if there's already a window/tab open with the target URL
+      // Try to find an existing window/tab with this origin
       for (let i = 0; i < clientList.length; i++) {
         const client = clientList[i];
-        if (client.url === urlToOpen && 'focus' in client) {
-          return client.focus();
+        if ('focus' in client) {
+          // Focus existing window and navigate to URL if different
+          client.focus();
+          if (client.url !== urlToOpen && 'navigate' in client) {
+            client.navigate(urlToOpen);
+          }
+          return;
         }
       }
-      // If not, open a new window/tab
+      // If no existing window, open a new one
       if (clients.openWindow) {
         return clients.openWindow(urlToOpen);
       }
+    }).catch((error) => {
+      console.error('Error handling notification click:', error);
     })
   );
 });

@@ -24,11 +24,50 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { subscription } = body;
 
+    console.log('Received subscription request:', {
+      userId: session.user.id,
+      hasSubscription: !!subscription,
+      hasEndpoint: !!subscription?.endpoint,
+      hasKeys: !!subscription?.keys,
+    });
+
     if (!subscription || !subscription.endpoint) {
       return NextResponse.json(
-        { error: "Invalid subscription" },
+        { error: "Invalid subscription: missing endpoint", details: "Subscription object is missing required endpoint field" },
         { status: 400 }
       );
+    }
+
+    // Validate subscription keys
+    if (!subscription.keys || !subscription.keys.p256dh || !subscription.keys.auth) {
+      return NextResponse.json(
+        { error: "Invalid subscription: missing keys", details: "Subscription object is missing required encryption keys" },
+        { status: 400 }
+      );
+    }
+
+    // Check for duplicate subscriptions and remove old ones first
+    try {
+      const existingSubscriptions = await prisma.notification.findMany({
+        where: {
+          userId: session.user.id,
+          type: 'push-subscription',
+        },
+      });
+
+      // Remove old subscriptions to avoid duplicates
+      if (existingSubscriptions.length > 0) {
+        await prisma.notification.deleteMany({
+          where: {
+            userId: session.user.id,
+            type: 'push-subscription',
+          },
+        });
+        console.log(`Removed ${existingSubscriptions.length} old subscription(s) for user ${session.user.id}`);
+      }
+    } catch (cleanupError) {
+      console.warn('Failed to cleanup old subscriptions:', cleanupError);
+      // Continue anyway
     }
 
     // Persist subscription as a Notification record (metadata) to avoid schema changes
@@ -41,16 +80,23 @@ export async function POST(req: Request) {
           metadata: subscription,
         },
       });
-    } catch (dbError) {
+      console.log(`Successfully saved subscription for user ${session.user.id}`);
+    } catch (dbError: any) {
       console.error('Failed to save subscription metadata to DB:', dbError);
-      return NextResponse.json({ error: 'Failed to save subscription' }, { status: 500 });
+      return NextResponse.json({ 
+        error: 'Failed to save subscription',
+        details: dbError.message || 'Database error',
+      }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Push subscription error:", error);
     return NextResponse.json(
-      { error: "Failed to subscribe" },
+      { 
+        error: "Failed to subscribe",
+        details: error.message || 'Unknown error',
+      },
       { status: 500 }
     );
   }
