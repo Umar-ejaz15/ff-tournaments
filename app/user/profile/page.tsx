@@ -15,6 +15,11 @@ export default async function ProfilePage() {
       redirect("/auth/login");
     }
 
+    // Enforce user role - admins should not access this page
+    if (session.user.role === "admin") {
+      redirect("/admin");
+    }
+
     let user;
     try {
       user = await prisma.user.findUnique({

@@ -228,9 +228,10 @@ export const authOptions: NextAuthOptions = {
       // Clean the URL to get the path
       let targetPath = url.replace(baseUrl, "");
 
-      // If URL is the base or login page, redirect to user page by default
-      // The login page will then redirect based on role
+      // If URL is the base or login page, determine correct dashboard based on role
       if (targetPath === "/" || targetPath.startsWith("/auth/login")) {
+        // This callback doesn't have access to session, so we redirect to /user by default
+        // The client-side logic (landing page) will handle role-based redirect
         return `${baseUrl}/user`;
       }
 
