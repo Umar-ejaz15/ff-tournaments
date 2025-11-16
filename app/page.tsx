@@ -18,7 +18,7 @@ export default function LandingPage() {
       if (session.user.role === "admin") {
         router.push("/admin");
       } else {
-        router.push("/user");
+        router.push("/user/player/dashboard");
       }
     }
   }, [status, session, router]);
