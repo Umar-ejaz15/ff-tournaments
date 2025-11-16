@@ -1,13 +1,22 @@
 /**
- * Cron Job API Route for Match Reminders
+ * Match Reminders API Route
  * 
- * VERCEL HOBBY PLAN: Limited to 1 cron job per day
- * This runs daily at 9 AM UTC to check for tournaments starting in the next 24 hours
+ * VERCEL HOBBY PLAN: Cron jobs are not available (Pro plan feature)
  * 
- * For more frequent reminders, consider:
- * 1. Upgrade to Vercel Pro plan (unlimited cron jobs)
- * 2. Use external service like cron-job.org to call this endpoint more frequently
- * 3. Use EasyCron or similar service (free tier available)
+ * To use this endpoint, set up an external cron service (free):
+ * 1. cron-job.org (free tier - can run every 10-30 minutes)
+ * 2. EasyCron (free tier available)
+ * 3. UptimeRobot (free tier available)
+ * 
+ * Setup:
+ * - URL: https://your-app.vercel.app/api/cron/match-reminders
+ * - Method: GET
+ * - Headers: Authorization: Bearer YOUR_CRON_SECRET
+ * - Schedule: Every 10-30 minutes (depending on service limits)
+ * 
+ * Or call manually via:
+ * curl -X GET https://your-app.vercel.app/api/cron/match-reminders \
+ *   -H "Authorization: Bearer YOUR_CRON_SECRET"
  */
 
 import { NextResponse } from "next/server";
