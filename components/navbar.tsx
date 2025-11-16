@@ -157,7 +157,7 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  {navItem("/user", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                  {navItem("/user/player/dashboard", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
                   {navItem("/user/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
                   {navItem("/user/leaderboard", "Leaderboard", <Trophy className="w-4 h-4" />)}
                   {navItem("/user/support", "Support", <Users className="w-4 h-4" />)}
@@ -238,7 +238,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                {mobileNavItem("/user", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                {mobileNavItem("//user/player/dashboard", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
                 {mobileNavItem("/user/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
                 {mobileNavItem("/user/leaderboard", "Leaderboard", <Trophy className="w-4 h-4" />)}
                 {mobileNavItem("/user/wallet", "My Wallet", <Wallet className="w-4 h-4" />)}
