@@ -169,7 +169,8 @@ export const authOptions: NextAuthOptions = {
 
           if (dbUser) {
             token.id = dbUser.id;
-            token.role = dbUser.role.toLowerCase(); // Normalize to lowercase
+            // Enforce role: only allow admin if explicitly set to "admin" in DB; otherwise default to "user"
+            token.role = (dbUser.role === "admin" ? "admin" : "user").toLowerCase();
             token.email = dbUser.email;
             token.name = dbUser.name;
           }
@@ -186,7 +187,7 @@ export const authOptions: NextAuthOptions = {
 
       // If session is being updated (e.g., role change)
       if (trigger === "update" && session?.role) {
-        token.role = session.role.toLowerCase();
+        token.role = (session.role === "admin" ? "admin" : "user").toLowerCase();
       }
 
       // Only try to fetch from database if we don't already have a role
@@ -197,7 +198,7 @@ export const authOptions: NextAuthOptions = {
             where: { email: token.email as string },
           });
           if (dbUser) {
-            token.role = dbUser.role.toLowerCase();
+            token.role = (dbUser.role === "admin" ? "admin" : "user").toLowerCase();
           } else {
             token.role = "user"; // Default role if user not found
           }
