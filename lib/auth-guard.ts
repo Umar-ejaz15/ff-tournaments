@@ -23,18 +23,12 @@ export async function checkAuth(requiredRole?: "admin" | "user") {
       email: true,
       name: true,
       role: true,
-      disabled: true,
     },
   });
 
   // User not found in DB (shouldn't happen but be safe)
   if (!user) {
     redirect("/auth/signup");
-  }
-
-  // Check if user is disabled
-  if (user.disabled) {
-    redirect("/auth/error?error=account_disabled");
   }
 
   // Enforce role if required
@@ -69,7 +63,6 @@ export async function getCurrentUser() {
         name: true,
         role: true,
         image: true,
-        disabled: true,
       },
     });
 
