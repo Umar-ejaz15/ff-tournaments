@@ -26,8 +26,11 @@ export default function AdminTransactionsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [activeStatus, setActiveStatus] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [searchEmail, setSearchEmail] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -43,15 +46,29 @@ export default function AdminTransactionsPage() {
     fetchTransactions();
   }, [session, status, router]);
 
+  // Filter transactions based on status and search
+  useEffect(() => {
+    let filtered = transactions.filter((tx) => tx.type !== "withdraw");
+
+    if (activeStatus !== "all") {
+      filtered = filtered.filter((tx) => tx.status === activeStatus);
+    }
+
+    if (searchEmail.trim()) {
+      filtered = filtered.filter((tx) =>
+        tx.user.email.toLowerCase().includes(searchEmail.toLowerCase())
+      );
+    }
+
+    setFilteredTransactions(filtered);
+  }, [transactions, activeStatus, searchEmail]);
+
   async function fetchTransactions() {
     try {
       const res = await fetch("/api/admin/transactions");
       if (res.ok) {
         const data = await res.json();
-
-        // ✅ Only show coin-purchasing (non-withdrawal) transactions
-        const filtered = data.filter((tx: Transaction) => tx.type !== "withdraw");
-        setTransactions(filtered);
+        setTransactions(data);
       }
     } catch (err) {
       console.error("Failed to fetch transactions:", err);
@@ -104,7 +121,7 @@ export default function AdminTransactionsPage() {
         <div className="mb-8">
           <Link
             href="/admin"
-            className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 inline-block transition-colors"
+            className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
@@ -116,13 +133,55 @@ export default function AdminTransactionsPage() {
           <p className="text-gray-400">Review and approve user top-ups (deposits)</p>
         </div>
 
-        {transactions.length === 0 ? (
+        {/* Status Tabs */}
+        <div className="mb-6 flex flex-wrap gap-2">
+          {(["all", "pending", "approved", "rejected"] as const).map((status) => (
+            <button
+              key={status}
+              onClick={() => setActiveStatus(status)}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                activeStatus === status
+                  ? "bg-yellow-500 text-black"
+                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+              }`}
+            >
+              {status === "all" ? "All Transactions" : status.charAt(0).toUpperCase() + status.slice(1)}
+              {activeStatus === status && (
+                <span className="ml-2 text-sm">
+                  ({filteredTransactions.length})
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search by email..."
+            value={searchEmail}
+            onChange={(e) => setSearchEmail(e.target.value)}
+            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500"
+          />
+          {searchEmail && (
+            <p className="text-sm text-gray-400 mt-2">
+              Found {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? "s" : ""}
+            </p>
+          )}
+        </div>
+
+        {filteredTransactions.length === 0 ? (
           <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 text-center">
-            <p className="text-gray-400">No coin purchase transactions</p>
+            <p className="text-gray-400">
+              {searchEmail
+                ? "No transactions found matching your search"
+                : `No ${activeStatus === "all" ? "" : activeStatus} transactions`}
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {transactions.map((tx) => (
+            {filteredTransactions.map((tx) => (
               <div
                 key={tx.id}
                 className="bg-gray-900/50 border border-gray-800 rounded-lg p-6"

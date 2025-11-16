@@ -4,13 +4,20 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import JoinedTournamentsBar from "@/components/JoinedTournamentsBar";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export const dynamic = "force-dynamic";
 
 export default async function UserLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
+  
   if (!session?.user?.email) {
     redirect("/auth/login");
+  }
+
+  // Enforce role-based access: only "user" role can access /user/*
+  if (session.user.role === "admin") {
+    redirect("/admin");
   }
 
   const user = await prisma.user.findUnique({
@@ -30,8 +37,12 @@ export default async function UserLayout({ children }: { children: React.ReactNo
   });
 
   if (!user) {
-    // If user record not found even though session exists, force redirect to signup
     redirect("/auth/signup");
+  }
+
+  // Extra safety: if user role in DB is not "user", show loading/error
+  if (user.role !== "user") {
+    return <LoadingSpinner message="Verifying your access..." />;
   }
 
   return (
