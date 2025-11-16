@@ -146,8 +146,10 @@ export default function SignupPage() {
     setError(null);
 
     try {
+      // Get origin from window if available, otherwise use default
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
       await signIn("google", {
-        callbackUrl: `${window.location.origin}/user`,
+        callbackUrl: origin ? `${origin}/user` : "/user",
       });
     } catch (err: any) {
       console.error("Google signup error:", err);

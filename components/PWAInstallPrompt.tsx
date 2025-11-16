@@ -14,8 +14,11 @@ export default function PWAInstallPrompt() {
   const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === "undefined") return;
+
     // Check if app is already installed
-    if (window.matchMedia("(display-mode: standalone)").matches) {
+    if (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) {
       setIsInstalled(true);
       return;
     }
@@ -33,13 +36,15 @@ export default function PWAInstallPrompt() {
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     // Check if user has dismissed the prompt before (stored in localStorage)
-    const dismissed = localStorage.getItem("pwa-install-dismissed");
-    if (dismissed) {
-      const dismissedTime = parseInt(dismissed, 10);
-      const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
-      // Show again after 7 days
-      if (daysSinceDismissed < 7) {
-        setShowPrompt(false);
+    if (typeof localStorage !== "undefined") {
+      const dismissed = localStorage.getItem("pwa-install-dismissed");
+      if (dismissed) {
+        const dismissedTime = parseInt(dismissed, 10);
+        const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
+        // Show again after 7 days
+        if (daysSinceDismissed < 7) {
+          setShowPrompt(false);
+        }
       }
     }
 
@@ -67,7 +72,9 @@ export default function PWAInstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    localStorage.setItem("pwa-install-dismissed", Date.now().toString());
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("pwa-install-dismissed", Date.now().toString());
+    }
   };
 
   if (isInstalled || !showPrompt || !deferredPrompt) {

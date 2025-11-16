@@ -18,12 +18,47 @@ export default function TournamentDetailPage() {
     { refreshInterval: 2000, revalidateOnFocus: true, revalidateOnReconnect: true }
   );
 
-  const copyLobbyCode = () => {
-    if (data?.lobbyCode) {
-      navigator.clipboard.writeText(data.lobbyCode);
+  const copyLobbyCode = async () => {
+    if (!data?.lobbyCode) return;
+    
+    // Check if clipboard API is available
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(data.lobbyCode);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error("Failed to copy:", err);
+        // Fallback for older browsers
+        fallbackCopyTextToClipboard(data.lobbyCode);
+      }
+    } else {
+      // Fallback for browsers without clipboard API
+      fallbackCopyTextToClipboard(data.lobbyCode);
+    }
+  };
+
+  const fallbackCopyTextToClipboard = (text: string) => {
+    if (typeof document === "undefined") return;
+    
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand("copy");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Fallback copy failed:", err);
     }
+    
+    document.body.removeChild(textArea);
   };
 
   if (isLoading) return <div className="p-6 text-white">Loading...</div>;

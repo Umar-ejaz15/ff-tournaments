@@ -9,6 +9,9 @@ export default function DashboardClient() {
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === "undefined") return;
+
     // Only prompt once per session
     const alreadyShown = sessionStorage.getItem("pushPromptShown");
     async function checkPush() {
