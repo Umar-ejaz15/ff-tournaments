@@ -1,0 +1,31 @@
+name: Match Reminders (every 10min)
+
+# This workflow calls the Vercel cron endpoint every 10 minutes.
+# It uses a repo secret `CRON_SECRET` (the same value as in Vercel env) and
+# a repo secret `SITE_URL` (your deployed site URL, e.g. https://your-site.vercel.app).
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # every 10 minutes (UTC)
+  workflow_dispatch: {}
+
+jobs:
+  call-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call match reminders endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          if [ -z "$SITE_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "SITE_URL or CRON_SECRET not set in repo secrets. Exiting.";
+            exit 1;
+          fi
+
+          status=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $CRON_SECRET" "$SITE_URL/api/cron/match-reminders")
+          echo "Endpoint returned HTTP status: $status"
+          if [ "$status" -ge 400 ]; then
+            echo "Warning: endpoint returned $status";
+            exit 1;
+          fi
