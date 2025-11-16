@@ -35,11 +35,15 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/_next/static/chunks/:path*",
+        source: "/_next/static/chunks/:path*.js",
         headers: [
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+          {
+            key: "Content-Type",
+            value: "application/javascript; charset=utf-8",
           },
         ],
       },

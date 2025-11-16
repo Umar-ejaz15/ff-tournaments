@@ -49,11 +49,13 @@ self.addEventListener('activate', (event) => {
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
             console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
+            return caches.delete(cacheName).catch(err => {
+              console.warn(`Failed to delete cache ${cacheName}:`, err);
+            });
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // Take control of all pages immediately
   );
 });
 
