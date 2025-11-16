@@ -28,7 +28,7 @@ export default async function PlayerDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Player Dashboard</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Player Dashboard</h1>
       <ProfilePage />
       <DashboardClient />
     </div>

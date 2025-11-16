@@ -127,7 +127,7 @@ export default function WalletPage() {
         </div>
 
         {/* Balance Card */}
-        <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 rounded-xl p-4 sm:p-8 mb-8">
+        <div className="bg-linear-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 rounded-xl p-4 sm:p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <p className="text-gray-400 text-xs sm:text-sm mb-2 flex items-center gap-1">
