@@ -35,12 +35,10 @@ export async function GET(req: Request) {
       };
     });
 
-    // Cache for 10 seconds on edge, allow stale for 60 seconds
+    // Cache for 10 seconds (Hobby plan compatible)
     return NextResponse.json(tournamentsWithParticipants, { 
       headers: { 
-        "Cache-Control": "public, s-maxage=10, stale-while-revalidate=60",
-        "CDN-Cache-Control": "public, s-maxage=10",
-        "Vercel-CDN-Cache-Control": "public, s-maxage=10"
+        "Cache-Control": "public, s-maxage=10, stale-while-revalidate=60"
       } 
     });
   } catch (error) {

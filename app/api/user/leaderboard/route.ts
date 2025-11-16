@@ -61,12 +61,10 @@ export async function GET() {
       };
     });
 
-    // Cache for 30 seconds on edge, allow stale for 2 minutes
+    // Cache for 30 seconds (Hobby plan compatible)
     return NextResponse.json(leaderboard, {
       headers: {
-        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120",
-        "CDN-Cache-Control": "public, s-maxage=30",
-        "Vercel-CDN-Cache-Control": "public, s-maxage=30"
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120"
       }
     });
   } catch (error) {

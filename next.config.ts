@@ -63,23 +63,13 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // API routes - Short cache for dynamic data
+      // API routes - Short cache for dynamic data (Hobby plan compatible)
       {
         source: "/api/tournaments",
         headers: [
           {
             key: "Cache-Control",
             value: "public, s-maxage=10, stale-while-revalidate=60",
-          },
-        ],
-      },
-      // Static pages - Cache for 5 minutes
-      {
-        source: "/",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, s-maxage=300, stale-while-revalidate=600",
           },
         ],
       },
