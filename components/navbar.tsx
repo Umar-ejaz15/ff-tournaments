@@ -3,7 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   LayoutDashboard, 
   Users, 
@@ -25,6 +25,16 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Ensure role-based route consistency: redirect away from mismatched areas
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role === "admin" && pathname?.startsWith("/user")) {
+      router.push("/admin");
+    }
+    if (status === "authenticated" && session?.user?.role === "user" && pathname?.startsWith("/admin")) {
+      router.push("/user");
+    }
+  }, [status, session, pathname, router]);
 
   const handleLogout = async () => {
     await signOut({ redirect: false });

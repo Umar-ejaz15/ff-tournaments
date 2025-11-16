@@ -31,6 +31,10 @@ export default function WalletPage() {
       return;
     }
     if (status === "authenticated" && session) {
+      if (session.user?.role === "admin") {
+        router.push("/admin");
+        return;
+      }
       fetchWalletData();
     }
   }, [session, status, router]);

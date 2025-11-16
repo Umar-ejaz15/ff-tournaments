@@ -21,8 +21,14 @@ interface Notification {
 export default function NotificationsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/auth/login");
+    if (status === "authenticated" && session?.user?.role === "admin") router.push("/admin");
+  }, [status, session, router]);
+
+  const shouldFetch = status === "authenticated" && session?.user?.role === "user";
   const { data: notifications = [], mutate } = useSWR<Notification[]>(
-    status === "authenticated" ? "/api/user/notifications" : null,
+    shouldFetch ? "/api/user/notifications" : null,
     fetcher,
     { refreshInterval: 3000 }
   );

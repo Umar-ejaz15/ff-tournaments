@@ -12,8 +12,9 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function UserWithdrawalsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { data: wallet } = useSWR(status === "authenticated" ? "/api/user/wallet" : null, fetcher, { refreshInterval: 2000 });
-  const { data: withdrawals, mutate } = useSWR(status === "authenticated" ? "/api/user/transactions?type=withdraw" : null, fetcher, { refreshInterval: 2000 });
+  const shouldFetch = status === "authenticated" && session?.user?.role === "user";
+  const { data: wallet } = useSWR(shouldFetch ? "/api/user/wallet" : null, fetcher, { refreshInterval: 2000 });
+  const { data: withdrawals, mutate } = useSWR(shouldFetch ? "/api/user/transactions?type=withdraw" : null, fetcher, { refreshInterval: 2000 });
 
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("EasyPaisa");
@@ -22,7 +23,8 @@ export default function UserWithdrawalsPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/auth/login");
-  }, [status, router]);
+    if (status === "authenticated" && session?.user?.role === "admin") router.push("/admin");
+  }, [status, session, router]);
 
   if (status === "loading") {
     return <LoadingSpinner message="Loading user data..." />;

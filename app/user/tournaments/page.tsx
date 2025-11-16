@@ -29,13 +29,19 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 export default function TournamentsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/auth/login");
+    if (status === "authenticated" && session?.user?.role === "admin") router.push("/admin");
+  }, [status, session, router]);
+
+  const shouldFetch = status === "authenticated" && session?.user?.role === "user";
   const { data: tournamentsRes, isLoading: tLoading } = useSWR<Tournament[]>(
-    status === "authenticated" ? "/api/tournaments" : null,
+    shouldFetch ? "/api/tournaments" : null,
     fetcher,
     { refreshInterval: 2000, revalidateOnFocus: true, revalidateOnReconnect: true }
   );
   const { data: walletRes, isLoading: wLoading, mutate: refreshWallet } = useSWR<{ balance: number }>(
-    status === "authenticated" ? "/api/user/wallet" : null,
+    shouldFetch ? "/api/user/wallet" : null,
     fetcher,
     { refreshInterval: 2000, revalidateOnFocus: true, revalidateOnReconnect: true }
   );
@@ -43,9 +49,7 @@ export default function TournamentsPage() {
   const [modeFilter, setModeFilter] = useState<"all" | "Solo" | "Duo" | "Squad">("all");
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
 
-  useEffect(() => {
-    if (status === "unauthenticated") router.push("/auth/login");
-  }, [status, router]);
+  
 
   const walletBalance = walletRes?.balance ?? 0;
   const tournaments = tournamentsRes ?? [];

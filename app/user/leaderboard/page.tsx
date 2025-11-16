@@ -26,15 +26,17 @@ interface LeaderboardEntry {
 export default function LeaderboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  useEffect(() => {
+    if (status === "unauthenticated") router.push("/auth/login");
+    if (status === "authenticated" && session?.user?.role === "admin") router.push("/admin");
+  }, [status, session, router]);
+
+  const shouldFetch = status === "authenticated" && session?.user?.role === "user";
   const { data: leaderboard = [], isLoading } = useSWR<LeaderboardEntry[]>(
-    status === "authenticated" ? "/api/user/leaderboard" : null,
+    shouldFetch ? "/api/user/leaderboard" : null,
     fetcher,
     { refreshInterval: 5000 }
   );
-
-  useEffect(() => {
-    if (status === "unauthenticated") router.push("/auth/login");
-  }, [status, router]);
 
   if (status === "loading") {
     return <LoadingSpinner message="Loading user data..." />;
