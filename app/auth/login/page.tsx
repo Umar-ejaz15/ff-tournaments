@@ -21,6 +21,7 @@ function LoginForm() {
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string;
     password?: string;
+    
   }>({});
 
   // Validation functions
