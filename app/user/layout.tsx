@@ -28,6 +28,17 @@ export default async function UserLayout({ children }: { children: React.ReactNo
       role: true,
       image: true,
       wallet: { select: { balance: true } },
+      teams: {
+        select: {
+          id: true,
+          team: {
+            select: {
+              name: true,
+              tournament: { select: { title: true } },
+            },
+          },
+        },
+      },
     },
   });
 

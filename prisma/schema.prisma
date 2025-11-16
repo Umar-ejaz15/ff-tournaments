@@ -43,6 +43,8 @@ model Wallet {
   user User @relation(fields: [userId], references: [id])
 }
 
+ 
+
 model Transaction {
   id          String   @id @default(cuid())
   userId      String

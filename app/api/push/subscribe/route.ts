@@ -31,16 +31,20 @@ export async function POST(req: Request) {
       );
     }
 
-    // Store subscription in database
-    // You might want to create a PushSubscription model in Prisma
-    // For now, we'll store it as JSON in user metadata or a separate table
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: {
-        // Store subscription in a JSON field if you add it to schema
-        // For now, we'll just return success
-      },
-    });
+    // Persist subscription as a Notification record (metadata) to avoid schema changes
+    try {
+      await prisma.notification.create({
+        data: {
+          userId: session.user.id,
+          type: 'push-subscription',
+          message: 'Push subscription registered',
+          metadata: subscription,
+        },
+      });
+    } catch (dbError) {
+      console.error('Failed to save subscription metadata to DB:', dbError);
+      return NextResponse.json({ error: 'Failed to save subscription' }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -59,10 +63,14 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Remove subscription
-    // Implementation depends on how you store subscriptions
-
-    return NextResponse.json({ success: true });
+    // Remove stored push-subscription metadata for this user
+    try {
+      await prisma.notification.deleteMany({ where: { userId: session.user.id, type: 'push-subscription' } });
+      return NextResponse.json({ success: true });
+    } catch (dbError) {
+      console.error('Failed to delete subscription metadata:', dbError);
+      return NextResponse.json({ error: 'Failed to unsubscribe' }, { status: 500 });
+    }
   } catch (error) {
     console.error("Push unsubscribe error:", error);
     return NextResponse.json(
