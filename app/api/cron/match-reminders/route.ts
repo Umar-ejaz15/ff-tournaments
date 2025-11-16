@@ -107,7 +107,7 @@ export async function GET(req: Request) {
       const notificationUrl = `/user/tournaments/${tournament.id}`;
 
       // Collect all user IDs who need notifications
-      const userIds = new Set<number>();
+      const userIds = new Set<string>();
       
       for (const team of tournament.teams) {
         userIds.add(team.captainId);
