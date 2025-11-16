@@ -14,6 +14,7 @@ self.addEventListener('install', (event) => {
         // Cache files individually to handle failures gracefully
         return Promise.allSettled(
           urlsToCache.map(url => 
+            
             fetch(url)
               .then(response => {
                 if (response.ok) {
