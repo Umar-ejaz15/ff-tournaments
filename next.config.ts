@@ -45,7 +45,7 @@ const nextConfig: NextConfig = {
       },
       // Public assets - Cache for 1 year
       {
-        source: "/(.*\\.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|ttf|eot))",
+        source: "/:path*.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|ttf|eot)",
         headers: [
           {
             key: "Cache-Control",
