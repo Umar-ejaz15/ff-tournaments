@@ -14,10 +14,17 @@ export default function PWAInstallPrompt() {
   const [isMobile, setIsMobile] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
     // Only run on client side
     if (typeof window === "undefined") return;
+
+    // Check if dismissed in session storage
+    const dismissed = sessionStorage.getItem("pwa-prompt-dismissed");
+    if (dismissed === "true") {
+      setIsDismissed(true);
+    }
 
     // Check if app is already installed
     if (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) {
@@ -68,8 +75,15 @@ export default function PWAInstallPrompt() {
     }
   };
 
-  // Don't show if already installed
-  if (isInstalled) {
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("pwa-prompt-dismissed", "true");
+    }
+  };
+
+  // Don't show if already installed or dismissed
+  if (isInstalled || isDismissed) {
     return null;
   }
 
@@ -99,9 +113,14 @@ export default function PWAInstallPrompt() {
                   {deferredPrompt ? "Install Now" : "Show Instructions"}
                 </button>
                 <button
-                  onClick={() => setShowInstructions(false)}
-                  className="bg-black/20 text-black font-semibold py-2 px-3 rounded-lg hover:bg-black/30 transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleDismiss();
+                  }}
+                  className="bg-black/20 text-black font-semibold py-2 px-3 rounded-lg hover:bg-black/30 active:bg-black/40 transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                   aria-label="Close"
+                  type="button"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -118,8 +137,14 @@ export default function PWAInstallPrompt() {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white">Install App</h3>
               <button
-                onClick={() => setShowInstructions(false)}
-                className="text-gray-400 hover:text-white transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowInstructions(false);
+                }}
+                className="text-gray-400 hover:text-white active:text-gray-300 transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+                type="button"
+                aria-label="Close instructions"
               >
                 <X className="w-6 h-6" />
               </button>

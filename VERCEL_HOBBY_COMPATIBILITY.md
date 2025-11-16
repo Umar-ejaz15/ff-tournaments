@@ -15,9 +15,8 @@
 - All routes compatible
 
 ### 3. **Cron Jobs** ✅
-- **Removed**: Vercel cron (Pro feature)
-- Using external services (free alternative)
-- Endpoint still works for manual/external calls
+- **Removed**: All cron job functionality
+- Match reminders feature removed
 
 ### 4. **Middleware** ✅
 - Next.js middleware (free)
@@ -47,9 +46,10 @@
 ## Features Removed (Pro Plan Only)
 
 1. ❌ **Vercel Cron Jobs** - Removed from vercel.json
-2. ❌ **Pro CDN Headers** - Removed CDN-Cache-Control and Vercel-CDN-Cache-Control
-3. ❌ **Edge Runtime** - Not used (would be Pro feature)
-4. ❌ **Extended Function Duration** - Limited to 10 seconds (Hobby max)
+2. ❌ **Match Reminders Cron** - Completely removed (was causing errors)
+3. ❌ **Pro CDN Headers** - Removed CDN-Cache-Control and Vercel-CDN-Cache-Control
+4. ❌ **Edge Runtime** - Not used (would be Pro feature)
+5. ❌ **Extended Function Duration** - Limited to 10 seconds (Hobby max)
 
 ## Current Configuration
 
@@ -81,14 +81,7 @@
 1. ✅ Optimized function durations
 2. ✅ Efficient caching strategy
 3. ✅ No Pro dependencies
-4. ✅ External services for cron (free)
-
-## External Services (Free Alternatives)
-
-### For Cron Jobs:
-- **cron-job.org** - Free tier available
-- **EasyCron** - Free tier available
-- **UptimeRobot** - Free tier available
+4. ✅ Removed problematic cron jobs
 
 ## Deployment Ready ✅
 

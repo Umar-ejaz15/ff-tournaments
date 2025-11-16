@@ -49,7 +49,4 @@ TWILIO_WHATSAPP_NUMBER="whatsapp:+14155238886"
 WHATSAPP_BUSINESS_TOKEN="your-whatsapp-business-token"
 WHATSAPP_BUSINESS_PHONE_ID="your-phone-number-id"
 
-# Cron Job Secret (for match reminders)
-# Generate a random secret: openssl rand -base64 32
-CRON_SECRET="your-random-secret-key-here"
 
