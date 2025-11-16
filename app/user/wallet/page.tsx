@@ -21,7 +21,7 @@ export default function WalletPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [withAmount, setWithAmount] = useState<string>("");
-  const [withMethod, setWithMethod] = useState<"EasyPaisa" | "JazzCash" | "Bank">("EasyPaisa");
+  const [withMethod, setWithMethod] = useState<"EasyPaisa" | "NayaPay">("EasyPaisa");
   const [withAccount, setWithAccount] = useState<string>("");
   const [withBusy, setWithBusy] = useState(false);
 
@@ -159,7 +159,7 @@ export default function WalletPage() {
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
             <h3 className="text-sm font-semibold text-blue-300 mb-3">Payment Instructions</h3>
             <div className="space-y-2 text-sm text-gray-300 mb-3">
-              <p><strong className="text-blue-300">Methods:</strong> EasyPaisa / JazzCash / NayaPay / Bank Transfer</p>
+              <p><strong className="text-blue-300">Methods:</strong> EasyPaisa / NayaPay</p>
               <p>After payment, upload screenshot. Admin verifies within 24 hours.</p>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-500/20">
@@ -246,8 +246,7 @@ export default function WalletPage() {
                 onChange={(e) => setWithMethod(e.target.value as any)}
               >
                 <option>EasyPaisa</option>
-                <option>JazzCash</option>
-                <option>Bank</option>
+                <option>NayaPay</option>
               </select>
             </label>
 

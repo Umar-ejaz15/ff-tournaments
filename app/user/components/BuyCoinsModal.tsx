@@ -13,7 +13,7 @@ export default function BuyCoinsModal({
   initialAmount?: number;
 }) {
   const [pkr, setPkr] = useState<number | "">(initialAmount || "");
-  const [method, setMethod] = useState<PaymentMethod>("JazzCash");
+  const [method, setMethod] = useState<PaymentMethod>("EasyPaisa");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofUrl, setProofUrl] = useState("");
   const [useUrlInput, setUseUrlInput] = useState(false);
@@ -173,10 +173,8 @@ export default function BuyCoinsModal({
             onChange={(e) => setMethod(e.target.value as PaymentMethod)}
             className="w-full border p-2 rounded mt-1"
           >
-            <option value="JazzCash">JazzCash</option>
             <option value="EasyPaisa">EasyPaisa</option>
             <option value="NayaPay">NayaPay</option>
-            <option value="Bank">Bank</option>
           </select>
         </label>
 

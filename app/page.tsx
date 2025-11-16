@@ -93,7 +93,7 @@ export default function LandingPage() {
             <FeatureCard
               icon={<Coins className="w-12 h-12 text-yellow-400 mx-auto mb-4" />}
               title="Easy Coin System"
-              desc="Simple payment with EasyPaisa, JazzCash, NayaPay, or Bank Transfer. 1 coin = Rs. 4"
+              desc="Simple manual payment with EasyPaisa or NayaPay. Upload proof and get verified. 1 coin = Rs. 4"
             />
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function LandingPage() {
             Support for multiple payment methods. Simply send payment, upload proof, and get verified!
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            {["EasyPaisa", "JazzCash", "NayaPay", "Bank Transfer"].map((method) => (
+            {["EasyPaisa", "NayaPay"].map((method) => (
               <div
                 key={method}
                 className="px-6 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white font-medium"

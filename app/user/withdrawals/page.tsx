@@ -73,8 +73,7 @@ export default function UserWithdrawalsPage() {
               <span className="text-sm text-gray-400">Method</span>
               <select className="bg-gray-800 p-2 rounded-lg" value={method} onChange={(e) => setMethod(e.target.value)}>
                 <option>EasyPaisa</option>
-                <option>JazzCash</option>
-                <option>Bank</option>
+                <option>NayaPay</option>
               </select>
             </label>
             <label className="flex flex-col gap-1">

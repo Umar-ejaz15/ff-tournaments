@@ -12,14 +12,7 @@ export const PAYMENT_METHODS = {
     accountNumber: "03367392390",
     name: "EasyPaisa",
   },
-  JazzCash: {
-    accountNumber: "03367392390", // Update if different
-    name: "JazzCash",
-  },
-  Bank: {
-    accountNumber: "03367392390", // Update with actual bank account
-    name: "Bank Transfer",
-  },
+  // Removed JazzCash and Bank - only EasyPaisa and NayaPay are supported now
 } as const;
 
 export type PaymentMethod = keyof typeof PAYMENT_METHODS;

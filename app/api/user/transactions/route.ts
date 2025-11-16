@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     if (amountCoins > 1200) {
       return NextResponse.json({ error: "Maximum withdrawal limit is 1200 coins" }, { status: 400 });
     }
-    if (!method || !["EasyPaisa", "JazzCash", "Bank"].includes(method)) {
+    if (!method || !["EasyPaisa", "NayaPay"].includes(method)) {
       return NextResponse.json({ error: "Invalid method" }, { status: 400 });
     }
 
