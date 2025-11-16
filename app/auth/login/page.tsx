@@ -67,7 +67,7 @@ function LoginForm() {
     if (status === "authenticated" && session?.user?.role) {
       const role = session.user.role.toLowerCase();
       if (role === "admin") {
-        router.push("/admin/board");
+        router.push("/admin");
       } else {
         router.push(callbackUrl);
       }
@@ -119,7 +119,7 @@ function LoginForm() {
       const role = sessionData?.user?.role?.toLowerCase();
 
       if (role === "admin") {
-        router.push("/admin/board");
+        router.push("/admin");
       } else {
         router.push(callbackUrl);
       }
