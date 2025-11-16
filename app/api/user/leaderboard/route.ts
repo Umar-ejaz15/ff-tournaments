@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 
+// Cache leaderboard for 30 seconds, allow stale for 2 minutes
+export const revalidate = 30;
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -58,7 +61,14 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(leaderboard);
+    // Cache for 30 seconds on edge, allow stale for 2 minutes
+    return NextResponse.json(leaderboard, {
+      headers: {
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120",
+        "CDN-Cache-Control": "public, s-maxage=30",
+        "Vercel-CDN-Cache-Control": "public, s-maxage=30"
+      }
+    });
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
     return NextResponse.json({ error: "Failed to fetch leaderboard" }, { status: 500 });

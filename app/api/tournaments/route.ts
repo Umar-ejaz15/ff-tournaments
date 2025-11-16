@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// Cache tournaments for 10 seconds, allow stale for 60 seconds
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 10;
 
 export async function GET(req: Request) {
   try {
@@ -34,7 +35,14 @@ export async function GET(req: Request) {
       };
     });
 
-    return NextResponse.json(tournamentsWithParticipants, { headers: { "Cache-Control": "no-store" } });
+    // Cache for 10 seconds on edge, allow stale for 60 seconds
+    return NextResponse.json(tournamentsWithParticipants, { 
+      headers: { 
+        "Cache-Control": "public, s-maxage=10, stale-while-revalidate=60",
+        "CDN-Cache-Control": "public, s-maxage=10",
+        "Vercel-CDN-Cache-Control": "public, s-maxage=10"
+      } 
+    });
   } catch (error) {
     console.error("Tournaments fetch error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

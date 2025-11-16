@@ -17,15 +17,20 @@ const nextConfig: NextConfig = {
       "./node_modules/@prisma/client/**/*",
     ],
   },
-  // Fix chunk loading issues with proper cache headers
+  // Comprehensive caching for Vercel Hobby plan
   async headers() {
     return [
+      // Next.js static assets - Cache for 1 year (immutable)
       {
         source: "/_next/static/:path*",
         headers: [
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
         ],
       },
@@ -35,6 +40,46 @@ const nextConfig: NextConfig = {
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // Public assets - Cache for 1 year
+      {
+        source: "/(.*\\.(jpg|jpeg|png|gif|webp|svg|ico|woff|woff2|ttf|eot))",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // Manifest and service worker - Cache for 1 hour
+      {
+        source: "/(manifest\\.json|sw\\.js)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, must-revalidate",
+          },
+        ],
+      },
+      // API routes - Short cache for dynamic data
+      {
+        source: "/api/tournaments",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=10, stale-while-revalidate=60",
+          },
+        ],
+      },
+      // Static pages - Cache for 5 minutes
+      {
+        source: "/",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=300, stale-while-revalidate=600",
           },
         ],
       },
