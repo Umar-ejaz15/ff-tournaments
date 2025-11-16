@@ -42,7 +42,8 @@ export async function POST(req: Request) {
       title,
       body: message,
       url: url || "/",
-      icon: "/icon-192.png",
+      icon: "/favicon.ico",
+      badge: "/favicon.ico",
     });
 
     await webpush.sendNotification(subscription, payload);

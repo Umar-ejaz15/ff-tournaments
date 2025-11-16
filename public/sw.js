@@ -1,14 +1,8 @@
 // Service Worker for FF Tournaments PWA
-const CACHE_NAME = 'ff-tournaments-v2';
+const CACHE_NAME = 'ff-tournaments-v3';
 const urlsToCache = [
   '/',
-  '/user/player/dashboard',
-  '/user/tournaments',
-  '/user/wallet',
-  '/auth/login',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/manifest.json'
 ];
 
 // Install event - cache resources
@@ -17,8 +11,22 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        // Cache files individually to handle failures gracefully
+        return Promise.allSettled(
+          urlsToCache.map(url => 
+            fetch(url)
+              .then(response => {
+                if (response.ok) {
+                  return cache.put(url, response);
+                }
+              })
+              .catch(err => {
+                console.warn(`Failed to cache ${url}:`, err);
+              })
+          )
+        );
       })
+      .then(() => self.skipWaiting()) // Activate immediately
   );
 });
 
@@ -55,8 +63,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'FF Tournaments';
   const options = {
     body: data.body || 'You have a new notification',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: data.icon || '/favicon.ico',
+    badge: data.badge || '/favicon.ico',
     tag: data.tag || 'notification',
     data: data.url || '/',
     requireInteraction: false,

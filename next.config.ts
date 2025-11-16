@@ -53,13 +53,23 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Manifest and service worker - Cache for 1 hour
+      // Manifest - Cache for 1 hour
       {
-        source: "/(manifest\\.json|sw\\.js)",
+        source: "/manifest.json",
         headers: [
           {
             key: "Cache-Control",
             value: "public, max-age=3600, must-revalidate",
+          },
+        ],
+      },
+      // Service worker - No cache (must always be fresh)
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
           },
         ],
       },

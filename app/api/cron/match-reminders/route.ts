@@ -157,8 +157,8 @@ export async function GET(req: Request) {
                   JSON.stringify({
                     title: "Tournament Reminder",
                     body: notificationMessage,
-                    icon: "/icon-192.png",
-                    badge: "/icon-192.png",
+                    icon: "/favicon.ico",
+                    badge: "/favicon.ico",
                     tag: `tournament-${tournament.id}`,
                     url: notificationUrl,
                     data: {
