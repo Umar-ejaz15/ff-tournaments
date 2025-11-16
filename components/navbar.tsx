@@ -85,6 +85,13 @@ export default function Navbar() {
 
   const isAdmin = session.user.role === "admin";
 
+  // Determine if the current path doesn't match the user's role (transient mismatch)
+  const userOnUserPath = pathname?.startsWith("/user");
+  const userOnAdminPath = pathname?.startsWith("/admin");
+  const roleMismatch =
+    status === "authenticated" &&
+    ((userOnUserPath && session?.user?.role !== "user") || (userOnAdminPath && session?.user?.role !== "admin"));
+
   const navItem = (href: string, label: string, icon?: React.ReactNode) => (
     <Link
       href={href}
@@ -151,15 +158,23 @@ export default function Navbar() {
             <NotificationBell />
 
             <div className="hidden md:flex items-center gap-3">
-              <UserIcon className="w-5 h-5 text-gray-400" />
-              <div className="text-right">
-                <p className="text-sm text-gray-300">{session.user.name}</p>
-                <p className="text-xs text-gray-500">{session.user.email}</p>
-              </div>
-              {isAdmin && (
-                <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs font-medium">
-                  Admin
-                </span>
+              {roleMismatch ? (
+                <div className="text-right">
+                  <p className="text-sm text-gray-300">Verifying access...</p>
+                </div>
+              ) : (
+                <>
+                  <UserIcon className="w-5 h-5 text-gray-400" />
+                  <div className="text-right">
+                    <p className="text-sm text-gray-300">{session.user.name}</p>
+                    <p className="text-xs text-gray-500">{session.user.email}</p>
+                  </div>
+                  {isAdmin && (
+                    <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs font-medium">
+                      Admin
+                    </span>
+                  )}
+                </>
               )}
             </div>
 

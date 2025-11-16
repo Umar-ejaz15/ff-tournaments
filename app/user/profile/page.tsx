@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Wallet, Receipt, CheckCircle, ArrowRight, Coins, User, Mail, Calendar, Trophy } from "lucide-react";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 // Mark as dynamic since we use getServerSession which requires headers
 export const dynamic = 'force-dynamic';
@@ -46,76 +47,15 @@ export default async function ProfilePage() {
       });
     } catch (prismaError: any) {
       console.error("Prisma error in ProfilePage:", prismaError);
-      console.error("Error details:", {
-        message: prismaError?.message,
-        code: prismaError?.code,
-        clientVersion: prismaError?.clientVersion,
-      });
-      
-      // Return a fallback UI with session data when Prisma fails
+      // Avoid exposing session user values here (they may be stale or from another role).
+      // Show a safe loading/verification UI instead and let the client retry or redirect.
       return (
-        <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold mb-2 text-yellow-400">User Dashboard</h1>
-              <p className="text-gray-400">Welcome back, {session.user.name || session.user.email}!</p>
-            </div>
-
-            {/* Error Notice */}
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 mb-8">
-              <h2 className="text-xl font-bold text-yellow-400 mb-2">⚠️ Limited Functionality</h2>
-              <p className="text-gray-300 mb-2">
-                Database connection is temporarily unavailable. Some features may not work.
-              </p>
-              <p className="text-sm text-gray-400">
-                Your session is active, but we cannot load your full profile data at this time.
-              </p>
-            </div>
-
-            {/* Basic Profile Info from Session */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <h2 className="text-xl font-bold mb-4 text-yellow-400">Profile Information</h2>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Name:</span>
-                    <span className="text-white font-medium">{session.user.name || "N/A"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Email:</span>
-                    <span className="text-white font-medium">{session.user.email}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Role:</span>
-                    <span className="text-white font-medium capitalize">{session.user.role || "user"}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <h2 className="text-xl font-bold mb-4 text-yellow-400">Quick Actions</h2>
-                <div className="space-y-3">
-                  <Link
-                    href="/user/wallet"
-                    className="block w-full px-4 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-lg text-center transition-colors"
-                  >
-                    My Wallet
-                  </Link>
-                  <Link
-                    href="/user/tournaments"
-                    className="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-center transition-colors"
-                  >
-                    Join Tournament
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-              <p className="text-gray-400 text-sm">
-                Please try refreshing the page in a few moments. If the problem persists, contact support.
-              </p>
+        <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white flex items-center justify-center p-6">
+          <div className="max-w-2xl w-full text-center">
+            <LoadingSpinner message="Verifying your account and loading data..." />
+            <p className="mt-6 text-gray-400">Please wait while we verify your access. If this takes too long, try logging out and logging in again.</p>
+            <div className="mt-4">
+              <Link href="/auth/login" className="text-sm text-blue-400 hover:underline">Go to login</Link>
             </div>
           </div>
         </div>

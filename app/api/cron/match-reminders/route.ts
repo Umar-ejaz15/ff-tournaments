@@ -11,7 +11,6 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { sendWhatsAppMessage, formatPhoneNumber } from "@/lib/whatsapp-bot";
 import webpush from "web-push";
 
 // Configure web-push
@@ -76,36 +75,8 @@ export async function GET(req: Request) {
       // Only send if between 25-35 minutes (to avoid duplicate sends)
       if (minutesUntilStart < 25 || minutesUntilStart > 35) continue;
 
-      // Collect all unique phone numbers from team members
-      const phoneNumbers = new Set<string>();
-
-      for (const team of tournament.teams) {
-        // Add team members' phones (captain phone is stored in TeamMember)
-        for (const member of team.members) {
-          if (member.phone) {
-            phoneNumbers.add(formatPhoneNumber(member.phone));
-          }
-        }
-      }
-
-      // Send WhatsApp reminders
-      const message = `🎮 FF Tournaments Reminder\n\nTournament: ${tournament.title}\nMode: ${tournament.mode}\nGame Type: ${tournament.gameType}\nStarts in: ${minutesUntilStart} minutes\n\n${tournament.lobbyCode ? `Lobby Code: ${tournament.lobbyCode}\n\n` : ""}Get ready to compete! Good luck! 🏆`;
-
-      for (const phone of phoneNumbers) {
-        try {
-          const sent = await sendWhatsAppMessage({
-            to: phone,
-            message: message,
-          });
-
-          if (sent) {
-            remindersSent++;
-          }
-        } catch (error) {
-          console.error(`Failed to send WhatsApp to ${phone}:`, error);
-          errors.push(`Failed to send to ${phone}`);
-        }
-      }
+      // (WhatsApp integration removed) — create in-app notifications and send push (if configured)
+      // Note: WhatsApp sending was removed because it caused issues; use push/in-app notifications instead.
 
       // Also send push notifications to users who have subscribed
       // This would require storing push subscriptions in the database
