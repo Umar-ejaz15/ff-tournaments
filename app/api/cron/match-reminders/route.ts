@@ -1,12 +1,13 @@
 /**
  * Cron Job API Route for Match Reminders
  * 
- * This endpoint should be called by a cron service (e.g., Vercel Cron, cron-job.org)
- * every 5-10 minutes to check for upcoming matches and send reminders
+ * VERCEL HOBBY PLAN: Limited to 1 cron job per day
+ * This runs daily at 9 AM UTC to check for tournaments starting in the next 24 hours
  * 
- * Setup:
- * 1. Add to vercel.json for Vercel Cron
- * 2. Or use external service like cron-job.org to call this endpoint
+ * For more frequent reminders, consider:
+ * 1. Upgrade to Vercel Pro plan (unlimited cron jobs)
+ * 2. Use external service like cron-job.org to call this endpoint more frequently
+ * 3. Use EasyCron or similar service (free tier available)
  */
 
 import { NextResponse } from "next/server";
@@ -34,14 +35,16 @@ export async function GET(req: Request) {
     }
 
     const now = new Date();
+    const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     const thirtyMinutesFromNow = new Date(now.getTime() + 30 * 60 * 1000);
 
-    // Find tournaments starting in the next 30 minutes
+    // Find tournaments starting in the next 24 hours (for daily cron job)
+    // We check a wider window since this only runs once per day on Hobby plan
     const upcomingTournaments = await prisma.tournament.findMany({
       where: {
         startTime: {
           gte: now,
-          lte: thirtyMinutesFromNow,
+          lte: twentyFourHoursFromNow,
         },
         status: {
           in: ["upcoming", "live"],
@@ -72,11 +75,26 @@ export async function GET(req: Request) {
 
       const timeUntilStart = startTime.getTime() - now.getTime();
       const minutesUntilStart = Math.floor(timeUntilStart / (60 * 1000));
+      const hoursUntilStart = Math.floor(minutesUntilStart / 60);
 
-      // Only send if between 25-35 minutes (to avoid duplicate sends)
-      if (minutesUntilStart < 25 || minutesUntilStart > 35) continue;
+      // Since this runs once per day, send reminders for tournaments:
+      // - Starting in the next 24 hours (for advance notice)
+      // - Or starting within the next 30 minutes (immediate reminder)
+      // This ensures users get reminders even with daily cron limit
+      if (minutesUntilStart < 0 || minutesUntilStart > 24 * 60) continue;
+      
+      // Format message based on time until start
+      let timeMessage = "";
+      if (minutesUntilStart < 60) {
+        timeMessage = `${minutesUntilStart} minute${minutesUntilStart !== 1 ? 's' : ''}`;
+      } else if (hoursUntilStart < 24) {
+        const remainingMinutes = minutesUntilStart % 60;
+        timeMessage = `${hoursUntilStart} hour${hoursUntilStart !== 1 ? 's' : ''}${remainingMinutes > 0 ? ` and ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}` : ''}`;
+      } else {
+        continue; // Skip if more than 24 hours
+      }
 
-      const notificationMessage = `Tournament "${tournament.title}" starts in ${minutesUntilStart} minutes!${tournament.lobbyCode ? ` Lobby Code: ${tournament.lobbyCode}` : ""}`;
+      const notificationMessage = `Tournament "${tournament.title}" starts in ${timeMessage}!${tournament.lobbyCode ? ` Lobby Code: ${tournament.lobbyCode}` : ""}`;
       const notificationUrl = `/user/tournaments/${tournament.id}`;
 
       // Collect all user IDs who need notifications
@@ -103,6 +121,7 @@ export async function GET(req: Request) {
               metadata: {
                 tournamentId: tournament.id,
                 minutesUntilStart,
+                hoursUntilStart,
               },
             },
           });
