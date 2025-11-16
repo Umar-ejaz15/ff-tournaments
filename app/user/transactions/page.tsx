@@ -28,7 +28,7 @@ export default async function TransactionsPage() {
     } catch (prismaError) {
       console.error("Prisma error in TransactionsPage:", prismaError);
       return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+        <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
               <h2 className="text-xl font-bold text-red-400 mb-2">Database Connection Error</h2>
@@ -42,7 +42,7 @@ export default async function TransactionsPage() {
     }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
           <Link
@@ -144,7 +144,7 @@ export default async function TransactionsPage() {
   } catch (error) {
     console.error("TransactionsPage error:", error);
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+      <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
             <h2 className="text-xl font-bold text-red-400 mb-2">Error Loading Page</h2>

@@ -16,31 +16,99 @@ export default function SignupPage() {
     confirmPassword: "",
   });
 
+  const [fieldErrors, setFieldErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
+
+  // Validation functions
+  const validateName = (name: string): string | undefined => {
+    const trimmed = name.trim();
+    if (!trimmed) return "Full name is required";
+    if (trimmed.length < 2) return "Name must be at least 2 characters";
+    if (trimmed.length > 100) return "Name must be less than 100 characters";
+    if (!/^[a-zA-Z\s'-]+$/.test(trimmed)) return "Name can only contain letters, spaces, hyphens and apostrophes";
+    return undefined;
+  };
+
+  const validateEmail = (email: string): string | undefined => {
+    const trimmed = email.trim();
+    if (!trimmed) return "Email is required";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmed)) return "Please enter a valid email address";
+    if (trimmed.length > 100) return "Email must be less than 100 characters";
+    return undefined;
+  };
+
+  const validatePassword = (password: string): string | undefined => {
+    if (!password) return "Password is required";
+    if (password.length < 8) return "Password must be at least 8 characters";
+    if (password.length > 100) return "Password must be less than 100 characters";
+    if (!/[a-z]/.test(password)) return "Password must contain at least one lowercase letter";
+    if (!/[A-Z]/.test(password)) return "Password must contain at least one uppercase letter";
+    if (!/[0-9]/.test(password)) return "Password must contain at least one number";
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return "Password must contain at least one special character";
+    return undefined;
+  };
+
+  const validateConfirmPassword = (password: string, confirmPassword: string): string | undefined => {
+    if (!confirmPassword) return "Please confirm your password";
+    if (password !== confirmPassword) return "Passwords do not match";
+    return undefined;
+  };
+
+  // Handle field changes with real-time validation
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Real-time validation
+    let error: string | undefined = undefined;
+    if (field === "name") error = validateName(value);
+    else if (field === "email") error = validateEmail(value);
+    else if (field === "password") error = validatePassword(value);
+    else if (field === "confirmPassword") error = validateConfirmPassword(formData.password, value);
+
+    setFieldErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
+    // Validate all fields
+    const nameError = validateName(formData.name);
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+    const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword);
+
+    const newErrors = {
+      name: nameError,
+      email: emailError,
+      password: passwordError,
+      confirmPassword: confirmPasswordError,
+    };
+
+    setFieldErrors(newErrors);
+
+    if (nameError || emailError || passwordError || confirmPasswordError) {
+      setError("Please fix the errors above and try again");
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      setIsLoading(false);
-      return;
-    }
+    setIsLoading(true);
 
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
+          name: formData.name.trim(),
+          email: formData.email.trim(),
           password: formData.password,
         }),
       });
@@ -55,7 +123,7 @@ export default function SignupPage() {
 
       // Auto login after signup
       const result = await signIn("credentials", {
-        email: formData.email,
+        email: formData.email.trim(),
         password: formData.password,
         redirect: false,
       });
@@ -89,7 +157,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8 bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 shadow-2xl">
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-2">Create Account</h1>
@@ -105,17 +173,23 @@ export default function SignupPage() {
         <form onSubmit={handleSignup} className="space-y-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium mb-2">
-              Name
+              Full Name
             </label>
             <input
               id="name"
               type="text"
-              required
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              onChange={(e) => handleFieldChange("name", e.target.value)}
+              className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 text-white transition-all ${
+                fieldErrors.name
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-700 focus:ring-blue-500"
+              }`}
               placeholder="John Doe"
             />
+            {fieldErrors.name && (
+              <p className="text-red-400 text-xs mt-1">{fieldErrors.name}</p>
+            )}
           </div>
 
           <div>
@@ -125,12 +199,18 @@ export default function SignupPage() {
             <input
               id="email"
               type="email"
-              required
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              onChange={(e) => handleFieldChange("email", e.target.value)}
+              className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 text-white transition-all ${
+                fieldErrors.email
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-700 focus:ring-blue-500"
+              }`}
               placeholder="your@email.com"
             />
+            {fieldErrors.email && (
+              <p className="text-red-400 text-xs mt-1">{fieldErrors.email}</p>
+            )}
           </div>
 
           <div>
@@ -140,13 +220,21 @@ export default function SignupPage() {
             <input
               id="password"
               type="password"
-              required
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              onChange={(e) => handleFieldChange("password", e.target.value)}
+              className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 text-white transition-all ${
+                fieldErrors.password
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-700 focus:ring-blue-500"
+              }`}
               placeholder="••••••••"
-              minLength={6}
             />
+            {fieldErrors.password && (
+              <p className="text-red-400 text-xs mt-1">{fieldErrors.password}</p>
+            )}
+            {formData.password && !fieldErrors.password && (
+              <p className="text-green-400 text-xs mt-1">✓ Password is strong</p>
+            )}
           </div>
 
           <div>
@@ -156,18 +244,26 @@ export default function SignupPage() {
             <input
               id="confirmPassword"
               type="password"
-              required
               value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              onChange={(e) => handleFieldChange("confirmPassword", e.target.value)}
+              className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 text-white transition-all ${
+                fieldErrors.confirmPassword
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-700 focus:ring-blue-500"
+              }`}
               placeholder="••••••••"
-              minLength={6}
             />
+            {fieldErrors.confirmPassword && (
+              <p className="text-red-400 text-xs mt-1">{fieldErrors.confirmPassword}</p>
+            )}
+            {formData.confirmPassword && !fieldErrors.confirmPassword && formData.password === formData.confirmPassword && (
+              <p className="text-green-400 text-xs mt-1">✓ Passwords match</p>
+            )}
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || Object.values(fieldErrors).some(e => e !== undefined)}
             className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
           >
             {isLoading ? "Creating Account..." : "Sign Up"}

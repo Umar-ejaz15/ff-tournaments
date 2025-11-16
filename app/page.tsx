@@ -29,7 +29,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
       {/* --- Hero Section --- */}
       <section className="flex flex-col items-center justify-center text-center py-32 px-6">
         <motion.h1
@@ -100,7 +100,7 @@ export default function LandingPage() {
       </section>
 
       {/* --- Prize Pool Section --- */}
-      <section className="py-24 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
+      <section className="py-24 px-6 bg-linear-to-b from-black via-gray-900 to-black">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-8 text-yellow-400">Tournament Prize Pools</h2>
           <div className="grid md:grid-cols-3 gap-6 mb-12">

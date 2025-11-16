@@ -105,7 +105,7 @@ export default function AdminTournamentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-8">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white p-8">
       <h1 className="text-2xl font-semibold mb-6 border-b border-gray-800 pb-2 flex items-center gap-2">
         <Trophy className="w-6 h-6 text-yellow-400" />
         Admin Dashboard — Tournaments

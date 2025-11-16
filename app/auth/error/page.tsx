@@ -25,7 +25,7 @@ function ErrorContent() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white px-6">
+    <div className="flex flex-col items-center justify-center h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white px-6">
       <div className="max-w-md w-full text-center space-y-6">
         <h1 className="text-3xl font-bold text-red-400">Authentication Error</h1>
         <p className="text-gray-300">{getErrorMessage(error)}</p>
@@ -53,7 +53,7 @@ export default function ErrorPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+        <div className="flex items-center justify-center h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
           <div className="text-lg">Loading...</div>
         </div>
       }

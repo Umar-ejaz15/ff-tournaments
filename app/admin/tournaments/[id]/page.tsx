@@ -53,7 +53,7 @@ export default function AdminTournamentDetailPage() {
   if (!data) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-6">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-semibold mb-2 text-yellow-400 flex items-center gap-2">

@@ -18,6 +18,41 @@ function LoginForm() {
     password: "",
   });
 
+  const [fieldErrors, setFieldErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+
+  // Validation functions
+  const validateEmail = (email: string): string | undefined => {
+    const trimmed = email.trim();
+    if (!trimmed) return "Email is required";
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmed)) return "Please enter a valid email address";
+    return undefined;
+  };
+
+  const validatePassword = (password: string): string | undefined => {
+    if (!password) return "Password is required";
+    if (password.length < 1) return "Password is required";
+    return undefined;
+  };
+
+  // Handle field changes with real-time validation
+  const handleFieldChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Real-time validation
+    let error: string | undefined = undefined;
+    if (field === "email") error = validateEmail(value);
+    else if (field === "password") error = validatePassword(value);
+
+    setFieldErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+  };
+
   // Get callback URL safely
   const rawCallbackUrl = searchParams?.get("callbackUrl") || "";
   const callbackUrl =
@@ -40,12 +75,29 @@ function LoginForm() {
   // Handle email/password login
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
+
+    // Validate all fields
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+
+    const newErrors = {
+      email: emailError,
+      password: passwordError,
+    };
+
+    setFieldErrors(newErrors);
+
+    if (emailError || passwordError) {
+      setError("Please fix the errors above and try again");
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const result = await signIn("credentials", {
-        email: formData.email,
+        email: formData.email.trim(),
         password: formData.password,
         redirect: false,
       });
@@ -95,7 +147,7 @@ function LoginForm() {
 
   if (status === "loading" || isLoading || isGoogleLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+      <div className="flex flex-col items-center justify-center h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
         <div className="text-lg mb-2">Loading...</div>
         <div className="text-sm text-gray-400">Please wait</div>
       </div>
@@ -103,7 +155,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8 bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 shadow-2xl">
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
@@ -124,12 +176,18 @@ function LoginForm() {
             <input
               id="email"
               type="email"
-              required
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              onChange={(e) => handleFieldChange("email", e.target.value)}
+              className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 text-white transition-all ${
+                fieldErrors.email
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-700 focus:ring-blue-500"
+              }`}
               placeholder="your@email.com"
             />
+            {fieldErrors.email && (
+              <p className="text-red-400 text-xs mt-1">{fieldErrors.email}</p>
+            )}
           </div>
 
           <div>
@@ -139,17 +197,23 @@ function LoginForm() {
             <input
               id="password"
               type="password"
-              required
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              onChange={(e) => handleFieldChange("password", e.target.value)}
+              className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 text-white transition-all ${
+                fieldErrors.password
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-700 focus:ring-blue-500"
+              }`}
               placeholder="••••••••"
             />
+            {fieldErrors.password && (
+              <p className="text-red-400 text-xs mt-1">{fieldErrors.password}</p>
+            )}
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || Object.values(fieldErrors).some(e => e !== undefined)}
             className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
           >
             {isLoading ? "Signing in..." : "Sign In"}
@@ -189,7 +253,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+        <div className="flex flex-col items-center justify-center h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
           <div className="text-lg">Loading...</div>
         </div>
       }

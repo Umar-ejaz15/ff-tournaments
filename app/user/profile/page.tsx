@@ -25,6 +25,18 @@ export default async function ProfilePage() {
             take: 5,
             orderBy: { createdAt: "desc" },
           },
+          teams: {
+            include: {
+              team: {
+                include: {
+                  tournament: true,
+                  members: true,
+                },
+              },
+            },
+            orderBy: { id: "desc" },
+            take: 10,
+          },
         },
       });
     } catch (prismaError: any) {
@@ -37,7 +49,7 @@ export default async function ProfilePage() {
       
       // Return a fallback UI with session data when Prisma fails
       return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+        <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             {/* Header */}
             <div className="mb-8">
@@ -106,7 +118,7 @@ export default async function ProfilePage() {
     }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
@@ -115,7 +127,7 @@ export default async function ProfilePage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
             <div className="flex items-center justify-between mb-2">
               <div className="text-gray-400 text-sm">Coins Balance</div>
@@ -123,6 +135,14 @@ export default async function ProfilePage() {
             </div>
             <div className="text-3xl font-bold text-yellow-400">{user?.wallet?.balance ?? 0}</div>
             <div className="text-xs text-gray-500 mt-1">Available coins</div>
+          </div>
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-gray-400 text-sm">Tournaments Joined</div>
+              <Trophy className="w-5 h-5 text-purple-400" />
+            </div>
+            <div className="text-3xl font-bold text-purple-400">{user?.teams?.length ?? 0}</div>
+            <div className="text-xs text-gray-500 mt-1">Active participations</div>
           </div>
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 hover:border-yellow-500/50 transition-all">
             <div className="flex items-center justify-between mb-2">
@@ -287,13 +307,95 @@ export default async function ProfilePage() {
             </p>
           </div>
         )}
+
+        {/* Joined Tournaments Section */}
+        {user?.teams && user.teams.length > 0 && (
+          <div className="mt-8 bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-yellow-400 flex items-center gap-2">
+                <Trophy className="w-6 h-6" />
+                Your Tournaments
+              </h2>
+              <span className="text-sm text-gray-400">
+                {user.teams.length} joined
+              </span>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {user.teams.map((teamMember) => {
+                const team = teamMember.team;
+                const tournament = team?.tournament;
+                const isCaptain = team?.captainId === user.id;
+                const totalMembers = team?.members?.length ?? 1;
+
+                return (
+                  <div key={team?.id} className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-yellow-500/50 transition-all">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-bold text-white mb-1 truncate">{tournament?.title}</h3>
+                        <p className="text-sm text-gray-400 mb-2">Team: {team?.name}</p>
+                      </div>
+                      {isCaptain && (
+                        <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-semibold rounded-full ml-2">
+                          Captain
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Mode:</span>
+                        <span className="text-white font-medium">{tournament?.mode}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Entry Fee:</span>
+                        <span className="text-yellow-400 font-medium">{tournament?.entryFee} coins</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Members:</span>
+                        <span className="text-blue-400 font-medium">{totalMembers}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Status:</span>
+                        <span className={`font-medium ${
+                          tournament?.status === "upcoming"
+                            ? "text-blue-400"
+                            : tournament?.status === "live"
+                            ? "text-green-400"
+                            : "text-gray-400"
+                        }`}>
+                          {tournament?.status}
+                        </span>
+                      </div>
+                      {tournament?.startTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Starts:</span>
+                          <span className="text-white text-xs">
+                            {new Date(tournament.startTime).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <Link
+                      href={`/user/tournaments/${tournament?.id}`}
+                      className="mt-4 block w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg font-medium text-sm transition-colors"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
   } catch (error) {
     console.error("ProfilePage error:", error);
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+      <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
             <h2 className="text-xl font-bold text-red-400 mb-2">Error Loading Page</h2>

@@ -99,7 +99,7 @@ export default function AdminTransactionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-8">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <Link

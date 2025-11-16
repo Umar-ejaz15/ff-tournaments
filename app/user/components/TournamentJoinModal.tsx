@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { calculatePrizeDistribution } from "@/lib/prize-distribution";
+import { toast } from "sonner";
 
 interface TeamMember {
   playerName: string;
@@ -55,33 +56,112 @@ export default function TournamentJoinModal({
     setTeamMembers(updated);
   };
 
+  // Validation helpers
+  const validatePlayerName = (name: string): string | null => {
+    const trimmed = name.trim();
+    if (!trimmed) return "Player name is required";
+    if (trimmed.length < 2) return "Player name must be at least 2 characters";
+    if (trimmed.length > 50) return "Player name must be less than 50 characters";
+    if (!/^[a-zA-Z0-9_\s-]+$/.test(trimmed)) return "Player name can only contain letters, numbers, hyphens and underscores";
+    return null;
+  };
+
+  const validateGameId = (gameId: string): string | null => {
+    const trimmed = gameId.trim();
+    if (!trimmed) return "Game ID is required";
+    if (!/^\d+$/.test(trimmed)) return "Game ID must contain only numbers";
+    if (trimmed.length < 5 || trimmed.length > 15) return "Game ID must be between 5 and 15 digits";
+    return null;
+  };
+
+  const validatePhoneNumber = (phone: string): string | null => {
+    const trimmed = phone.trim();
+    if (!trimmed) return "Phone number is required";
+    // Pakistan phone format validation (03XX-XXXXXXX or 03XXXXXXXXX)
+    if (!/^(\+92|0)?3[0-9]{2}[-]?[0-9]{7}$|^(\+92|0)?3[0-9]{9}$/.test(trimmed.replace(/\s/g, ''))) {
+      return "Please enter a valid Pakistan phone number (e.g., 03001234567)";
+    }
+    return null;
+  };
+
+  const validateEmail = (email: string): string | null => {
+    if (!email.trim()) return null; // Email is optional
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return "Please enter a valid email address";
+    return null;
+  };
+
+  const validateTeamName = (name: string): string | null => {
+    const trimmed = name.trim();
+    if (!trimmed) return "Team name is required";
+    if (trimmed.length < 3) return "Team name must be at least 3 characters";
+    if (trimmed.length > 50) return "Team name must be less than 50 characters";
+    if (!/^[a-zA-Z0-9_\s-]+$/.test(trimmed)) return "Team name can only contain letters, numbers, hyphens and underscores";
+    return null;
+  };
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
-    // Validation
-    if (!captain.playerName.trim() || !captain.phone.trim() || !captain.gameId.trim()) {
-      setError("Captain details are required (name, phone, game id)");
-      return;
-    }
-    if (tournament.mode !== "Solo" && !teamName.trim()) {
-      setError("Team name is required");
+    // Validate captain details
+    const captainNameError = validatePlayerName(captain.playerName);
+    if (captainNameError) {
+      setError(`Captain - ${captainNameError}`);
       return;
     }
 
+    const captainGameIdError = validateGameId(captain.gameId);
+    if (captainGameIdError) {
+      setError(`Captain - ${captainGameIdError}`);
+      return;
+    }
+
+    const captainPhoneError = validatePhoneNumber(captain.phone);
+    if (captainPhoneError) {
+      setError(`Captain - ${captainPhoneError}`);
+      return;
+    }
+
+    const captainEmailError = validateEmail(captain.email || "");
+    if (captainEmailError) {
+      setError(`Captain - ${captainEmailError}`);
+      return;
+    }
+
+    // Validate team name for non-solo modes
     if (tournament.mode !== "Solo") {
+      const teamNameError = validateTeamName(teamName);
+      if (teamNameError) {
+        setError(teamNameError);
+        return;
+      }
+
+      // Validate team members
       for (let i = 0; i < teamMembers.length; i++) {
         const member = teamMembers[i];
-        if (!member.playerName.trim()) {
-          setError(`Player ${i + 1} name is required`);
+        
+        const memberNameError = validatePlayerName(member.playerName);
+        if (memberNameError) {
+          setError(`Team Member ${i + 1} - ${memberNameError}`);
           return;
         }
-        if (!member.phone.trim()) {
-          setError(`Player ${i + 1} phone is required`);
+
+        const memberGameIdError = validateGameId(member.gameId);
+        if (memberGameIdError) {
+          setError(`Team Member ${i + 1} - ${memberGameIdError}`);
           return;
         }
-        if (!member.gameId.trim()) {
-          setError(`Player ${i + 1} Free Fire Game ID is required`);
+
+        const memberPhoneError = validatePhoneNumber(member.phone);
+        if (memberPhoneError) {
+          setError(`Team Member ${i + 1} - ${memberPhoneError}`);
+          return;
+        }
+
+        const memberEmailError = validateEmail(member.email || "");
+        if (memberEmailError) {
+          setError(`Team Member ${i + 1} - ${memberEmailError}`);
           return;
         }
       }
@@ -114,11 +194,16 @@ export default function TournamentJoinModal({
         throw new Error(data.error || "Failed to join tournament");
       }
 
-      alert(`Successfully joined ${tournament.title}!`);
+      toast.success(`🎉 Successfully joined ${tournament.title}!`, {
+        duration: 3000,
+      });
       onClose();
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Something went wrong");
+      toast.error(err.message || "Failed to join tournament", {
+        duration: 4000,
+      });
     } finally {
       setLoading(false);
     }
@@ -255,7 +340,7 @@ export default function TournamentJoinModal({
           {tournament.mode !== "Solo" && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-white mb-4">
-                Team Members ({tournament.mode === "Duo" ? "1 member" : "3 members"} + You)
+                {tournament.mode === "Duo" ? "1 Additional Team Member" : "3 Additional Team Members"}
               </h3>
               <div className="space-y-4">
                 {teamMembers.map((member, index) => (

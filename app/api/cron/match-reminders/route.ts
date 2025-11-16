@@ -80,19 +80,10 @@ export async function GET(req: Request) {
       const phoneNumbers = new Set<string>();
 
       for (const team of tournament.teams) {
-        // Add captain's phone if available
-        if (team.captain.phone) {
-          phoneNumbers.add(formatPhoneNumber(team.captain.phone));
-        }
-
-        // Add team members' phones
+        // Add team members' phones (captain phone is stored in TeamMember)
         for (const member of team.members) {
           if (member.phone) {
             phoneNumbers.add(formatPhoneNumber(member.phone));
-          }
-          // Also check if user has phone in their profile
-          if (member.user?.phone) {
-            phoneNumbers.add(formatPhoneNumber(member.user.phone));
           }
         }
       }

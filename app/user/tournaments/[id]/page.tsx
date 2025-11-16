@@ -31,7 +31,7 @@ export default function TournamentDetailPage() {
   if (!data) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Link
           href="/user/tournaments"

@@ -55,7 +55,7 @@ export default function UserWithdrawalsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <Link href="/user" className="text-blue-400 hover:text-blue-300 mb-4 inline-block text-sm sm:text-base">← Back to Dashboard</Link>
         <h1 className="text-2xl sm:text-3xl font-bold text-yellow-400 mb-2">Withdrawals</h1>
