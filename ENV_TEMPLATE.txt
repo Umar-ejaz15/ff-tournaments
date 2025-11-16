@@ -14,6 +14,13 @@ NEXTAUTH_SECRET="your-secret-key-here-minimum-32-characters-long"
 # Production URL (update with your actual domain)
 NEXTAUTH_URL="http://localhost:3000"
 
+# Example: when using a Vercel preview deployment (update per-preview)
+# For local dev keep the localhost value. For production set to your production domain.
+# Example preview hostname used in logs: ff-tournament-beta.vercel.app
+# If you deploy previews, set NEXTAUTH_URL to that preview host in Vercel's Environment Variables
+# e.g. in the Vercel preview project set:
+# NEXTAUTH_URL="https://ff-tournament-beta.vercel.app"
+
 # Google OAuth Configuration
 # Get these from: https://console.cloud.google.com/apis/credentials
 GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"

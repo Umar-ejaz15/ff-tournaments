@@ -41,7 +41,8 @@ This document outlines the fixes applied to resolve Prisma Query Engine errors a
      - `https://ff-tournaments.vercel.app` (for production)
    - Authorized redirect URIs must include:
      - `http://localhost:3000/api/auth/callback/google` (for local dev)
-     - `https://ff-tournaments.vercel.app/api/auth/callback/google` (for production)
+      - `https://ff-tournaments.vercel.app/api/auth/callback/google` (for production)
+      - `https://ff-tournament-beta.vercel.app/api/auth/callback/google` (for preview/staging)
 
 2. **Vercel Environment Variables:**
    Ensure these are set in Vercel → Settings → Environment Variables:
@@ -62,6 +63,11 @@ Go to your Vercel project → Settings → Environment Variables and verify:
 - [ ] `NEXTAUTH_URL` is set to `https://ff-tournaments.vercel.app` (no trailing slash)
 - [ ] `GOOGLE_CLIENT_ID` is set
 - [ ] `GOOGLE_CLIENT_SECRET` is set
+
+If you are using a Vercel preview deployment (for example `ff-tournament-beta.vercel.app`), also:
+
+- Set `NEXTAUTH_URL` in that Vercel project's Environment Variables to the preview hostname, e.g. `https://ff-tournament-beta.vercel.app` (no trailing slash).
+- Register the preview callback URI in Google Cloud Console under Authorized redirect URIs: `https://ff-tournament-beta.vercel.app/api/auth/callback/google`.
 
 ### 2. Update Google Cloud Console
 
