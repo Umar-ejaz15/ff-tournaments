@@ -7,31 +7,40 @@ function unauthorized() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+// GET: list transactions (filter by status/type)
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user || session.user.role !== "admin") return unauthorized();
 
     const url = new URL(req.url);
-    const status = url.searchParams.get("status");
+    const status = url.searchParams.get("status") || undefined;
+    const type = url.searchParams.get("type") || undefined;
 
-    const where: any = { type: "deposit" };
+    const where: any = {};
     if (status) where.status = status;
+    if (type) where.type = type;
 
-    const transactions = await prisma.transaction.findMany({
+    const results = await prisma.transaction.findMany({
       where,
-      include: { user: { select: { id: true, name: true, email: true } } },
       orderBy: { createdAt: "desc" },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+      },
       take: 200,
     });
 
-    return NextResponse.json(transactions, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json(results ?? [], { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("GET /api/admin/transactions error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Admin transactions API error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
+// POST: admin actions (approve/reject)
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -48,13 +57,8 @@ export async function POST(req: Request) {
       if (tx.status === "approved") return NextResponse.json({ error: "Already approved" }, { status: 400 });
 
       await prisma.$transaction(async (txdb) => {
-        // mark transaction approved
         await txdb.transaction.update({ where: { id }, data: { status: "approved" } });
-
-        // credit user's wallet
         await txdb.wallet.update({ where: { userId: tx.userId }, data: { balance: { increment: tx.amountCoins } } });
-
-        // create notification
         await txdb.notification.create({
           data: {
             userId: tx.userId,
@@ -88,61 +92,5 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("POST /api/admin/transactions error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-}
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import prisma from "@/lib/prisma";
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-export async function GET(req: Request) {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    if (session.user.role !== "admin") {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-    }
-
-    const { searchParams } = new URL(req.url);
-    const status = searchParams.get("status") || "pending";
-    const type = searchParams.get("type") || undefined;
-
-    const where: any = { status };
-    if (type) where.type = type;
-
-    const results = await prisma.transaction.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            wallet: {
-              select: {
-                balance: true,
-              },
-            },
-          },
-        },
-      },
-      take: 200,
-    });
-
-    // ✅ Always return an array (even if empty)
-    return NextResponse.json(results ?? [], {
-      headers: { "Cache-Control": "no-store" },
-    });
-  } catch (error) {
-    console.error("Admin transactions API error:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
