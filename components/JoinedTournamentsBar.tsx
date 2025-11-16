@@ -11,7 +11,7 @@ export default function JoinedTournamentsBar({ user }: { user: any }) {
     <div className="w-full bg-gray-900/60 border border-gray-800 rounded-xl p-4 mb-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
-          <div className="bg-linear-to-r from-yellow-500 to-orange-400 p-2 rounded-lg flex-shrink-0">
+          <div className="bg-linear-to-r from-yellow-500 to-orange-400 p-2 rounded-lg shrink-0">
             <Trophy className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">

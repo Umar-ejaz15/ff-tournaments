@@ -115,6 +115,21 @@ export default function Navbar() {
     </Link>
   );
 
+  const mobileNavItem = (href: string, label: string, icon?: React.ReactNode) => (
+    <Link
+      href={href}
+      className={`w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+        pathname?.startsWith(href)
+          ? "bg-gray-800 text-yellow-400"
+          : "text-gray-300 hover:text-white hover:bg-gray-800"
+      }`}
+      onClick={() => setIsMenuOpen(false)}
+    >
+      {icon && <span className="w-4 h-4">{icon}</span>}
+      {label}
+    </Link>
+  );
+
   return (
     <nav className="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -210,26 +225,26 @@ export default function Navbar() {
 
         {/* Mobile Dropdown */}
         {isMenuOpen && (
-          <div className="md:hidden mt-2 bg-gray-800 border border-gray-700 rounded-lg p-2">
+          <div className="md:hidden mt-2 bg-gray-800 border border-gray-700 rounded-lg p-2 space-y-1">
             {isAdmin ? (
               <>
-                {navItem("/admin", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
-                {navItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
-                {navItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
-                {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
-                {navItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
-                {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
-                {navItem("/admin/support/requests", "Support Requests", <Users className="w-4 h-4" />)}
+                {mobileNavItem("/admin", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                {mobileNavItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
+                {mobileNavItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
+                {mobileNavItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
+                {mobileNavItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
+                {mobileNavItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
+                {mobileNavItem("/admin/support/requests", "Support Requests", <Users className="w-4 h-4" />)}
               </>
             ) : (
               <>
-                {navItem("/user", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
-                {navItem("/user/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
-                {navItem("/user/leaderboard", "Leaderboard", <Trophy className="w-4 h-4" />)}
-                {navItem("/user/wallet", "My Wallet", <Wallet className="w-4 h-4" />)}
-                {navItem("/user/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
-                {navItem("/user/transactions", "Transactions", <History className="w-4 h-4" />)}
-                {navItem("/user/support", "Support", <Users className="w-4 h-4" />)}
+                {mobileNavItem("/user", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                {mobileNavItem("/user/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
+                {mobileNavItem("/user/leaderboard", "Leaderboard", <Trophy className="w-4 h-4" />)}
+                {mobileNavItem("/user/wallet", "My Wallet", <Wallet className="w-4 h-4" />)}
+                {mobileNavItem("/user/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
+                {mobileNavItem("/user/transactions", "Transactions", <History className="w-4 h-4" />)}
+                {mobileNavItem("/user/support", "Support", <Users className="w-4 h-4" />)}
               </>
             )}
             <button
