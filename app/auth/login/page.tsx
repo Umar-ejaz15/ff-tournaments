@@ -17,11 +17,12 @@ function LoginForm() {
     email: "",
     password: "",
   });
+  
 
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string;
     password?: string;
-    
+
   }>({});
 
   // Validation functions
