@@ -60,14 +60,14 @@ function LoginForm() {
   const callbackUrl =
     rawCallbackUrl && rawCallbackUrl.startsWith("/")
       ? rawCallbackUrl
-      : "/user";
+      : "/user/player/dashboard";
 
   // Redirect user if session is already authenticated
   useEffect(() => {
     if (status === "authenticated" && session?.user?.role) {
       const role = session.user.role.toLowerCase();
       if (role === "admin") {
-        router.push("/admin");
+        router.push("/admin/board");
       } else {
         router.push(callbackUrl);
       }
@@ -119,7 +119,7 @@ function LoginForm() {
       const role = sessionData?.user?.role?.toLowerCase();
 
       if (role === "admin") {
-        router.push("/admin");
+        router.push("/admin/board");
       } else {
         router.push(callbackUrl);
       }

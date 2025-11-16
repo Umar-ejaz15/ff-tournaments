@@ -230,9 +230,10 @@ export const authOptions: NextAuthOptions = {
 
       // If URL is the base or login page, determine correct dashboard based on role
       if (targetPath === "/" || targetPath.startsWith("/auth/login")) {
-        // This callback doesn't have access to session, so we redirect to /user by default
-        // The client-side logic (landing page) will handle role-based redirect
-        return `${baseUrl}/user`;
+        // This callback doesn't have access to session, so we redirect to the
+        // user player dashboard by default. Server `/user` route still enforces
+        // role-based redirects and will send admins to the admin area.
+        return `${baseUrl}/user/player/dashboard`;
       }
 
       // Validate the URL is from same origin
@@ -243,8 +244,8 @@ export const authOptions: NextAuthOptions = {
         return url;
       }
 
-      // Default to user page
-      return `${baseUrl}/user`;
+      // Default to player dashboard
+      return `${baseUrl}/user/player/dashboard`;
     },
   },
 

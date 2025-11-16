@@ -138,12 +138,14 @@ export default function Navbar() {
                   {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
                   {navItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
                   {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
+                  {navItem("/admin/support/requests", "Support Requests", <Users className="w-4 h-4" />)}
                 </>
               ) : (
                 <>
                   {navItem("/user", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
                   {navItem("/user/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
                   {navItem("/user/leaderboard", "Leaderboard", <Trophy className="w-4 h-4" />)}
+                  {navItem("/user/support", "Support", <Users className="w-4 h-4" />)}
                   <div className="relative group">
                     <button className="px-3 py-2 rounded-lg transition-colors text-gray-300 hover:text-white hover:bg-gray-800 flex items-center gap-1">
                       <Wallet className="w-4 h-4" />
@@ -217,6 +219,7 @@ export default function Navbar() {
                 {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
                 {navItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
                 {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
+                {navItem("/admin/support/requests", "Support Requests", <Users className="w-4 h-4" />)}
               </>
             ) : (
               <>
@@ -226,6 +229,7 @@ export default function Navbar() {
                 {navItem("/user/wallet", "My Wallet", <Wallet className="w-4 h-4" />)}
                 {navItem("/user/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
                 {navItem("/user/transactions", "Transactions", <History className="w-4 h-4" />)}
+                {navItem("/user/support", "Support", <Users className="w-4 h-4" />)}
               </>
             )}
             <button

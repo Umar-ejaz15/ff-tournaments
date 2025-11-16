@@ -10,12 +10,8 @@ export default function SessionGuard({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const router = useRouter();
 
-  // While NextAuth is loading, block render with a full-screen loading UI
-  if (status === "loading") {
-    return <LoadingSpinner message="Verifying your account and loading data..." />;
-  }
-
   // If authenticated, enforce role-based routing to avoid mixing admin/user areas
+  // NOTE: this hook must always be called (do not place it after an early return)
   useEffect(() => {
     if (status !== "authenticated" || !session?.user) return;
 
@@ -31,6 +27,11 @@ export default function SessionGuard({ children }: { children: React.ReactNode }
       return;
     }
   }, [status, session, pathname, router]);
+
+  // While NextAuth is loading, block render with a full-screen loading UI
+  if (status === "loading") {
+    return <LoadingSpinner message="Verifying your account and loading data..." />;
+  }
 
   // Render children when not loading. Unauthenticated users are allowed to see public pages.
   return <>{children}</>;

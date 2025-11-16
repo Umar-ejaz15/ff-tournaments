@@ -16,9 +16,18 @@ export default function JoinedTournamentsBar({ user }: { user: any }) {
           </div>
           <div>
             <div className="text-sm text-gray-300">Joined Tournaments</div>
-            <div className="text-2xl font-bold text-yellow-400">{count} participation{count !== 1 ? "s" : ""}</div>
-            {preview.length > 0 && (
-              <div className="text-xs text-gray-400 mt-1">{preview.join(" • ")}</div>
+            {count > 0 ? (
+              <div>
+                <div className="text-2xl font-bold text-yellow-400">{count} joined tournament{count !== 1 ? "s" : ""}</div>
+                {preview.length > 0 && (
+                  <div className="text-xs text-gray-400 mt-1">{preview.join(" • ")}</div>
+                )}
+              </div>
+            ) : (
+              <div className="text-2xl font-bold text-yellow-400">0 joined</div>
+            )}
+            {count === 0 && (
+              <div className="text-xs text-gray-400 mt-2">You haven't joined any tournaments yet. Browse to join one.</div>
             )}
           </div>
         </div>

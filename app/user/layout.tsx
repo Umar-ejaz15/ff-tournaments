@@ -15,24 +15,19 @@ export default async function UserLayout({ children }: { children: React.ReactNo
     redirect("/auth/login");
   }
 
-  // Enforce role-based access: only "user" role can access /user/*
-  if (session.user.role === "admin") {
-    redirect("/admin");
-  }
 
+  // Fetch only minimal user fields here to keep layout fast. Heavy queries
+  // (teams, transactions with lots of joins) will be fetched in child pages
+  // where they are actually needed.
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    include: {
-      wallet: true,
-      teams: {
-        include: {
-          team: {
-            include: { tournament: true, members: true },
-          },
-        },
-        orderBy: { id: "desc" },
-      },
-      transactions: { take: 5, orderBy: { createdAt: "desc" } },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      image: true,
+      wallet: { select: { balance: true } },
     },
   });
 
@@ -40,11 +35,8 @@ export default async function UserLayout({ children }: { children: React.ReactNo
     redirect("/auth/signup");
   }
 
-  // Extra safety: if user role in DB is not "user", redirect to admin
-  // This prevents any admin account data from rendering under /user routes.
-  if (user.role !== "user") {
-    redirect("/admin");
-  }
+  // Do not bluntly redirect here. Child pages should enforce role-specific access.
+  // We still fetch the DB user to provide contextual data to `/user/*` pages.
 
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
