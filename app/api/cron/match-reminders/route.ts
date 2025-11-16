@@ -63,7 +63,7 @@ export async function GET(req: Request) {
     });
 
     let remindersSent = 0;
-    let errors = [];
+    let errors: string[] = [];
 
     for (const tournament of upcomingTournaments) {
       const startTime = tournament.startTime ? new Date(tournament.startTime) : null;
