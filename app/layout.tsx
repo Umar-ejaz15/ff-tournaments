@@ -5,6 +5,7 @@ import { Providers } from "@/components/providers";
 import Navbar from "@/components/navbar";
 import ServiceWorkerRegistration from "@/app/components/ServiceWorkerRegistration";
 import SessionGuard from "@/components/SessionGuard";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,6 +49,7 @@ export default function RootLayout({
             <Navbar />
             {children}
           </SessionGuard>
+          <PWAInstallPrompt />
         </Providers>
       </body>
     </html>

@@ -1,52 +1,56 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import fs from "fs/promises";
-import path from "path";
-
-const DATA_DIR = path.join(process.cwd(), "data");
-const FILE = path.join(DATA_DIR, "support-requests.json");
-
-async function ensureFile() {
-  try {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    try {
-      await fs.access(FILE);
-    } catch (e) {
-      await fs.writeFile(FILE, JSON.stringify([]), "utf8");
-    }
-  } catch (err) {
-    console.error("ensureFile error:", err);
-  }
-}
+import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const body = await req.json();
-    const { subject, message } = body;
-    if (!subject || !message) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    const { subject, category, priority, message } = body;
+    
+    if (!subject || !category || !priority || !message) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
 
-    await ensureFile();
-    const content = await fs.readFile(FILE, "utf8");
-    const list = JSON.parse(content || "[]");
+    const entry = await prisma.supportRequest.create({
+      data: {
+        userId: session.user.id,
+        subject,
+        category,
+        priority,
+        message,
+        status: "open",
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
 
-    const entry = {
-      id: Date.now().toString(),
-      email: session.user.email,
-      name: session.user.name || null,
-      subject,
-      message,
-      status: "open",
-      createdAt: new Date().toISOString(),
-    };
-
-    list.unshift(entry);
-    await fs.writeFile(FILE, JSON.stringify(list, null, 2), "utf8");
-
-    return NextResponse.json({ ok: true, entry });
+    return NextResponse.json({
+      ok: true,
+      entry: {
+        id: entry.id,
+        subject: entry.subject,
+        category: entry.category,
+        priority: entry.priority,
+        message: entry.message,
+        status: entry.status,
+        email: entry.user.email,
+        name: entry.user.name,
+        createdAt: entry.createdAt.toISOString(),
+        updatedAt: entry.updatedAt.toISOString(),
+      },
+    });
   } catch (error) {
     console.error("Support POST error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -56,19 +60,43 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    await ensureFile();
-    const content = await fs.readFile(FILE, "utf8");
-    const list = JSON.parse(content || "[]");
-
-    // Admins see all requests; users see their own
-    if (session.user.role === "admin") {
-      return NextResponse.json(list);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userRequests = list.filter((r: any) => r.email === session.user.email);
-    return NextResponse.json(userRequests);
+    // Admins see all requests; users see their own
+    const where = session.user.role === "admin" ? {} : { userId: session.user.id };
+
+    const requests = await prisma.supportRequest.findMany({
+      where,
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const formattedRequests = requests.map((req) => ({
+      id: req.id,
+      subject: req.subject,
+      category: req.category,
+      priority: req.priority,
+      message: req.message,
+      status: req.status,
+      email: req.user.email,
+      name: req.user.name,
+      adminResponse: req.adminResponse,
+      createdAt: req.createdAt.toISOString(),
+      updatedAt: req.updatedAt.toISOString(),
+    }));
+
+    return NextResponse.json(formattedRequests);
   } catch (error) {
     console.error("Support GET error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -9,7 +9,6 @@ import { Wallet, Coins, ArrowLeft, ArrowDownUp, History, Plus, CreditCard, Arrow
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { getAllPaymentMethods } from "@/lib/payment-config";
 import { pkrToCoinsWithDiscount } from "@/lib/coins-discount";
-import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 export default function WalletPage() {
   const { data: session, status } = useSession();
@@ -353,8 +352,6 @@ export default function WalletPage() {
           }}
         />
       )}
-
-      <PWAInstallPrompt />
     </div>
   );
 }

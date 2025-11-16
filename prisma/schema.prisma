@@ -11,24 +11,25 @@ datasource db {
 
 
 model User {
-  id             String        @id @default(cuid())
+  id             String           @id @default(cuid())
   name           String
-  email          String        @unique
+  email          String           @unique
   password       String?
-  role           String        @default("user")
-  coins          Int           @default(0)
-  createdAt      DateTime      @default(now())
+  role           String           @default("user")
+  coins          Int              @default(0)
+  createdAt      DateTime         @default(now())
   emailVerified  DateTime?
   image          String?
-  wins           Int           @default(0)
-  starEligible   Boolean       @default(false)
+  wins           Int              @default(0)
+  starEligible   Boolean          @default(false)
 
   // ✅ Relations
   wallet         Wallet?
   transactions   Transaction[]
-  teams          TeamMember[] @relation("TeamMembers")
+  teams          TeamMember[]     @relation("TeamMembers")
   Team           Team[]
   notifications  Notification[]
+  supportRequests SupportRequest[]
   accounts       Account[]
   sessions       Session[]
 }
@@ -163,4 +164,25 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model SupportRequest {
+  id            String   @id @default(cuid())
+  userId        String
+  subject       String
+  category      String
+  priority      String   @default("medium")
+  message       String
+  status        String   @default("open")
+  adminResponse String?
+  updatedBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([category])
+  @@index([priority])
 }
