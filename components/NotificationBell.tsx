@@ -35,16 +35,6 @@ export default function NotificationBell() {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const [isPushSupported, setIsPushSupported] = useState(false);
-  const [isPushEnabled, setIsPushEnabled] = useState(false);
-  useEffect(() => {
-    const supported = typeof window !== "undefined" && "Notification" in window && "serviceWorker" in navigator;
-    setIsPushSupported(supported);
-    if (supported) {
-      setIsPushEnabled(Notification.permission === "granted");
-    }
-  }, []);
-
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -94,11 +84,6 @@ export default function NotificationBell() {
         {unreadCount > 0 && (
           <span className="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
             {unreadCount > 9 ? "9+" : unreadCount}
-          </span>
-        )}
-        {!isPushEnabled && isPushSupported && (
-          <span className="absolute -bottom-1 -right-1 bg-yellow-500 text-black rounded-full w-4 h-4 flex items-center justify-center text-[10px]" title="Push disabled">
-            !
           </span>
         )}
       </button>

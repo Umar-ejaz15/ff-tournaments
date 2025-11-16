@@ -91,7 +91,7 @@ export default function PWAInstallPrompt() {
           <div className="flex-1">
             <h3 className="font-bold text-lg mb-1">Install FF Tournaments</h3>
             <p className="text-sm text-black/80 mb-3">
-              Add to your home screen for quick access and receive push notifications!
+              Add to your home screen for quick access!
             </p>
             <div className="flex gap-2">
               <button
