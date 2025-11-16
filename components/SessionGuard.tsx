@@ -23,7 +23,13 @@ export default function SessionGuard({ children }: { children: React.ReactNode }
     }
 
     if (role === "user" && pathname?.startsWith("/admin")) {
-      router.replace("/user");
+      router.replace("/user/player/dashboard");
+      return;
+    }
+    
+    // Redirect authenticated users from /user to their dashboard
+    if (role === "user" && pathname === "/user") {
+      router.replace("/user/player/dashboard");
       return;
     }
   }, [status, session, pathname, router]);

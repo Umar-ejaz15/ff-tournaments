@@ -1,12 +1,14 @@
 // Service Worker for FF Tournaments PWA
-const CACHE_NAME = 'ff-tournaments-v1';
+const CACHE_NAME = 'ff-tournaments-v2';
 const urlsToCache = [
   '/',
-  '/user',
+  '/user/player/dashboard',
   '/user/tournaments',
   '/user/wallet',
   '/auth/login',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 // Install event - cache resources

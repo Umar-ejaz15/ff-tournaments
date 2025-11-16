@@ -4,6 +4,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 function LoginForm() {
   const router = useRouter();
@@ -255,9 +256,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex flex-col items-center justify-center h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
-          <div className="text-lg">Loading...</div>
-        </div>
+        <LoadingSpinner message="Loading login page..." />
       }
     >
       <LoginForm />

@@ -4,11 +4,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { History, ArrowLeft, Receipt, CheckCircle, XCircle, Clock, ExternalLink } from "lucide-react";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { Suspense } from "react";
 
 // Mark as dynamic since we use getServerSession which requires headers
 export const dynamic = 'force-dynamic';
 
-export default async function TransactionsPage() {
+async function TransactionsContent() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -47,7 +49,7 @@ export default async function TransactionsPage() {
         <div className="mb-8">
           <Link
             href="/user"
-            className="flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 inline-block transition-colors"
+            className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
@@ -156,5 +158,13 @@ export default async function TransactionsPage() {
       </div>
     );
   }
+}
+
+export default async function TransactionsPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner message="Loading your transactions..." />}>
+      <TransactionsContent />
+    </Suspense>
+  );
 }
 

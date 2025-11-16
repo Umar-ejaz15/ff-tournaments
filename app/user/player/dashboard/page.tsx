@@ -23,7 +23,7 @@ export default async function PlayerDashboardPage() {
   // Only allow users with role 'user' to view the player dashboard.
   if (user.role !== "user") {
     // If an admin visits this URL, send them to the admin dashboard.
-    redirect("/user/admin/dashboard");
+    redirect("/admin");
   }
 
   return (

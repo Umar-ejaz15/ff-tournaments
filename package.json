@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "node scripts/postinstall-prisma.js || prisma generate",
-    "vercel-build": "prisma generate --schema=./prisma/schema.prisma && next build"
+    "vercel-build": "prisma generate --schema=./prisma/schema.prisma && next build",
+    "clear-cache": "node scripts/clear-cache.js"
   },
   "prisma": {
     "seed": "node prisma/seed.cjs"

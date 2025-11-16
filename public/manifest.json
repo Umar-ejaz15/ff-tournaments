@@ -7,6 +7,7 @@
   "background_color": "#000000",
   "theme_color": "#eab308",
   "orientation": "portrait-primary",
+  "scope": "/",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -36,6 +37,13 @@
       "short_name": "Wallet",
       "description": "Manage your coins",
       "url": "/user/wallet",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Go to dashboard",
+      "url": "/user/player/dashboard",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]

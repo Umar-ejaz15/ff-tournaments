@@ -36,6 +36,11 @@ export default function Navbar() {
     }
   }, [status, session, pathname, router]);
 
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
   const handleLogout = async () => {
     await signOut({ redirect: false });
     router.push("/");
@@ -226,11 +231,11 @@ export default function Navbar() {
 
         {/* Mobile Dropdown Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden border-t border-gray-700 bg-gray-900 py-2 space-y-1">
+          <div className="lg:hidden border-t border-gray-700 bg-gray-900 py-2 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
             {/* Mobile User Info */}
             <div className="px-3 py-2 text-sm">
-              <p className="text-gray-300 font-medium truncate">{session?.user?.name}</p>
-              <p className="text-xs text-gray-500 truncate">{session?.user?.email}</p>
+              <p className="text-gray-300 font-medium truncate">{session?.user?.name || "User"}</p>
+              <p className="text-xs text-gray-500 truncate">{session?.user?.email || ""}</p>
               {isAdmin && (
                 <span className="inline-block mt-1 px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs font-medium">
                   Admin

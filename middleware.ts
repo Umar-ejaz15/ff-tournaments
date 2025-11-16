@@ -18,9 +18,17 @@ export default withAuth(
       return NextResponse.redirect(new URL("/user/player/dashboard", req.url));
     }
 
-    // ✅ Redirect admins trying to access regular user routes
+    // ✅ Redirect admins trying to access regular user routes (except /user/admin/dashboard which redirects)
     if (isUserRoute && isAdmin) {
-      return NextResponse.redirect(new URL("/admin", req.url));
+      // Allow /user/admin/dashboard to redirect internally, but block other /user/* routes
+      if (pathname !== "/user/admin/dashboard") {
+        return NextResponse.redirect(new URL("/admin", req.url));
+      }
+    }
+    
+    // ✅ Redirect regular users from /user to /user/player/dashboard
+    if (pathname === "/user" && userRole === "user") {
+      return NextResponse.redirect(new URL("/user/player/dashboard", req.url));
     }
 
     // ✅ Allow the request

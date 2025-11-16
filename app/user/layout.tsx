@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
@@ -8,7 +8,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 
 export const dynamic = "force-dynamic";
 
-export default async function UserLayout({ children }: { children: React.ReactNode }) {
+async function UserLayoutContent({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
   
   if (!session?.user?.email) {
@@ -46,6 +46,12 @@ export default async function UserLayout({ children }: { children: React.ReactNo
     redirect("/auth/signup");
   }
 
+  // Prevent admins from accessing /user routes - they should only access /admin routes
+  // This ensures admin information is never exposed in user layout
+  if (user.role === "admin") {
+    redirect("/admin");
+  }
+
   // Do not bluntly redirect here. Child pages should enforce role-specific access.
   // We still fetch the DB user to provide contextual data to `/user/*` pages.
 
@@ -56,5 +62,13 @@ export default async function UserLayout({ children }: { children: React.ReactNo
         <div className="mt-4 sm:mt-6">{children}</div>
       </div>
     </div>
+  );
+}
+
+export default async function UserLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<LoadingSpinner message="Verifying your account and loading data..." />}>
+      <UserLayoutContent>{children}</UserLayoutContent>
+    </Suspense>
   );
 }

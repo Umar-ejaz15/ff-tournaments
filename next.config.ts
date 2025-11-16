@@ -17,6 +17,33 @@ const nextConfig: NextConfig = {
       "./node_modules/@prisma/client/**/*",
     ],
   },
+  // Fix chunk loading issues with proper cache headers
+  async headers() {
+    return [
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/chunks/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ];
+  },
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: ["lucide-react", "@radix-ui/react-dialog"],
+  },
 };
 
 export default nextConfig;

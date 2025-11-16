@@ -34,9 +34,9 @@ export default async function UserDashboard() {
     redirect("/auth/signup");
   }
 
-  // Redirect to role-specific dashboard under /user
+  // Redirect admins to admin area (not /user/admin/dashboard)
   if (user.role === "admin") {
-    redirect("/user/admin/dashboard");
+    redirect("/admin");
   }
 
   // Default to player dashboard for regular users

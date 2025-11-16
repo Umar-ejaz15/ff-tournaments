@@ -37,22 +37,22 @@ export default function DashboardClient() {
   }, []);
 
   return (
-    <div className="space-y-6 mt-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <h2 className="text-xl font-semibold">Welcome back!</h2>
-          <p className="text-sm text-gray-400">Quick actions</p>
+    <div className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+          <h2 className="text-lg sm:text-xl font-semibold">Welcome back!</h2>
+          <p className="text-xs sm:text-sm text-gray-400">Quick actions</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
           <button
             onClick={() => setShowPopup(true)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
+            className="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg text-sm sm:text-base min-h-[44px] touch-manipulation transition-colors"
           >
             Open Help Box
           </button>
 
-          <div className="w-48">
+          <div className="w-full sm:w-48">
             <PushNotificationSetup />
           </div>
         </div>

@@ -10,11 +10,11 @@ export default function LoadingSpinner({ message = "Loading..." }: { message?: s
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
-        className="flex flex-col items-center gap-6"
+        className="flex flex-col items-center gap-4 sm:gap-6 max-w-md w-full"
       >
         {/* Animated loader */}
-        <div className="relative w-16 h-16">
-          <Loader2 className="w-16 h-16 animate-spin text-yellow-400" />
+        <div className="relative w-12 h-12 sm:w-16 sm:h-16">
+          <Loader2 className="w-12 h-12 sm:w-16 sm:h-16 animate-spin text-yellow-400" />
           <motion.div
             className="absolute inset-0 rounded-full border-2 border-transparent border-t-yellow-300"
             animate={{ rotate: 360 }}
@@ -26,7 +26,7 @@ export default function LoadingSpinner({ message = "Loading..." }: { message?: s
         <motion.div
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-lg font-medium text-gray-300"
+          className="text-base sm:text-lg font-medium text-gray-300 text-center px-4"
         >
           {message}
         </motion.div>
@@ -44,7 +44,7 @@ export default function LoadingSpinner({ message = "Loading..." }: { message?: s
         </motion.div>
 
         {/* Subtle description */}
-        <div className="text-sm text-gray-500 text-center mt-4">
+        <div className="text-xs sm:text-sm text-gray-500 text-center mt-2 sm:mt-4 px-4">
           Please wait while we prepare your experience
         </div>
       </motion.div>

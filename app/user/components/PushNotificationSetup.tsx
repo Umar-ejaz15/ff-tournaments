@@ -129,20 +129,20 @@ export default function PushNotificationSetup() {
   }
 
   return (
-    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-yellow-400" />
-          <h3 className="font-semibold text-white">Push Notifications</h3>
+    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3 sm:p-4">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 shrink-0" />
+          <h3 className="font-semibold text-white text-sm sm:text-base truncate">Push Notifications</h3>
         </div>
         {isSubscribed ? (
-          <CheckCircle className="w-5 h-5 text-green-400" />
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 shrink-0" />
         ) : (
-          <XCircle className="w-5 h-5 text-gray-500" />
+          <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 shrink-0" />
         )}
       </div>
 
-      <p className="text-gray-400 text-sm mb-4">
+      <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">
         {isSubscribed
           ? "You'll receive push notifications for tournament updates, match reminders, and prize announcements."
           : "Enable push notifications to receive instant updates about your tournaments, match reminders, and prizes."}
@@ -150,7 +150,7 @@ export default function PushNotificationSetup() {
 
       {message && (
         <div
-          className={`mb-4 p-3 rounded-lg text-sm ${
+          className={`mb-3 sm:mb-4 p-2 sm:p-3 rounded-lg text-xs sm:text-sm ${
             message.includes("Successfully")
               ? "bg-green-500/20 text-green-400"
               : "bg-red-500/20 text-red-400"
@@ -163,23 +163,26 @@ export default function PushNotificationSetup() {
       <button
         onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
         disabled={isLoading}
-        className={`w-full py-2 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+        className={`w-full py-2.5 sm:py-2 px-4 rounded-lg font-semibold text-sm sm:text-base transition-colors flex items-center justify-center gap-2 min-h-[44px] touch-manipulation ${
           isSubscribed
-            ? "bg-red-600 hover:bg-red-700 text-white"
-            : "bg-yellow-500 hover:bg-yellow-400 text-black"
+            ? "bg-red-600 hover:bg-red-700 active:bg-red-800 text-white"
+            : "bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-300 text-black"
         } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         {isLoading ? (
-          "Processing..."
+          <span className="flex items-center gap-2">
+            <span className="animate-spin">⏳</span>
+            Processing...
+          </span>
         ) : isSubscribed ? (
           <>
-            <BellOff className="w-4 h-4" />
-            Disable Notifications
+            <BellOff className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">Disable Notifications</span>
           </>
         ) : (
           <>
-            <Bell className="w-4 h-4" />
-            Enable Notifications
+            <Bell className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">Enable Notifications</span>
           </>
         )}
       </button>

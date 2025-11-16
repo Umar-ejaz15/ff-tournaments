@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import useSWR from "swr";
 import { Bell, Check, CheckCheck, ArrowLeft, Trophy, Wallet, Receipt, Calendar, X } from "lucide-react";
 import Link from "next/link";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -27,10 +28,10 @@ export default function NotificationsPage() {
   }, [status, session, router]);
 
   const shouldFetch = status === "authenticated" && session?.user?.role === "user";
-  const { data: notifications = [], mutate } = useSWR<Notification[]>(
+  const { data: notifications = [], mutate, isLoading } = useSWR<Notification[]>(
     shouldFetch ? "/api/user/notifications" : null,
     fetcher,
-    { refreshInterval: 3000 }
+    { refreshInterval: 3000, revalidateOnFocus: true, revalidateOnReconnect: true }
   );
 
   useEffect(() => {
@@ -77,11 +78,11 @@ export default function NotificationsPage() {
   }
 
   if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading user data..." />;
+  }
+
+  if (isLoading && notifications.length === 0) {
+    return <LoadingSpinner message="Loading notifications..." />;
   }
 
   return (
