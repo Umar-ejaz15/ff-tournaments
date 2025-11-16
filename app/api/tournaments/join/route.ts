@@ -47,16 +47,33 @@ export async function POST(req: Request) {
 
     // Validate captain data and team member counts
     if (!captain || !captain.playerName || !captain.phone || !captain.gameId) {
+      console.warn("Tournament join validation failed - captain missing fields", { captain });
       return NextResponse.json(
         { error: "Captain details required: playerName, phone, gameId" },
         { status: 400 }
       );
     }
+
     const requiredMembers = teamSize - 1; // excluding captain
     const providedMembers = Array.isArray(teamMembers) ? teamMembers.length : 0;
-    if (providedMembers !== requiredMembers) {
+
+    // Filter out empty/placeholder members (client may send empty objects)
+    const validTeamMembers = Array.isArray(teamMembers)
+      ? teamMembers.filter((m: any) => m && m.playerName && m.gameId && m.phone)
+      : [];
+
+    if (validTeamMembers.length !== requiredMembers) {
+      console.warn("Tournament join validation failed - team members mismatch", {
+        requiredMembers,
+        providedMembers,
+        validTeamMembersCount: validTeamMembers.length,
+        teamMembersSample: teamMembers?.slice?.(0, 3),
+      });
+
       return NextResponse.json(
-        { error: `Invalid team members. Expected ${requiredMembers} members.` },
+        {
+          error: `Invalid team members. Expected ${requiredMembers} valid member(s). Received ${validTeamMembers.length}.`,
+        },
         { status: 400 }
       );
     }
@@ -101,8 +118,8 @@ export async function POST(req: Request) {
                 gameId: captain.gameId,
                 email: captain.email,
               },
-              // Add team members (for Duo/Squad)
-              ...(teamMembers || []).map((member: any) => ({
+              // Add team members (for Duo/Squad) - use only validated members
+              ...validTeamMembers.map((member: any) => ({
                 playerName: member.playerName,
                 phone: member.phone,
                 gameId: member.gameId,
