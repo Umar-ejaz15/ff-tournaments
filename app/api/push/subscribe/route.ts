@@ -1,65 +1,74 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import prisma from "@/lib/prisma";
 
-const DATA_FILE = path.join(process.cwd(), "data", "push-subscriptions.json");
+export const dynamic = "force-dynamic";
 
-async function readSubs() {
-  try {
-    const raw = await fs.readFile(DATA_FILE, "utf8");
-    return JSON.parse(raw || "[]");
-  } catch (err: any) {
-    if (err.code === "ENOENT") return [];
-    throw err;
-  }
+const MAX_ENDPOINT_LENGTH = 3000;
+const MAX_KEY_LENGTH = 2000;
+
+function isValidString(v: any) {
+  return typeof v === "string" && v.trim().length > 0;
 }
 
-async function writeSubs(subs: any[]) {
-  await fs.mkdir(path.dirname(DATA_FILE), { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(subs, null, 2), "utf8");
-}
-
+// POST: Save or update a push subscription for the authenticated user
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const subscription = body.subscription ?? body;
+    const endpoint = subscription?.endpoint?.trim();
+    const p256dh = subscription?.keys?.p256dh?.trim();
+    const auth = subscription?.keys?.auth?.trim();
 
-    if (!subscription || !subscription.endpoint) {
+    if (!isValidString(endpoint) || !isValidString(p256dh) || !isValidString(auth)) {
       return NextResponse.json({ error: "Invalid subscription" }, { status: 400 });
     }
 
-    const subs = await readSubs();
-    const exists = subs.find((s: any) => s?.subscription?.endpoint === subscription.endpoint || s?.endpoint === subscription.endpoint);
-    if (!exists) {
-      subs.push({ subscription, createdAt: new Date().toISOString() });
-      await writeSubs(subs);
+    if (endpoint.length > MAX_ENDPOINT_LENGTH || p256dh.length > MAX_KEY_LENGTH || auth.length > MAX_KEY_LENGTH) {
+      return NextResponse.json({ error: "Subscription fields too long" }, { status: 400 });
     }
 
-    return NextResponse.json({ ok: true }, { status: 201 });
-  } catch (error) {
-    console.error("❌ Subscribe error:", error);
-    return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 });
-  }
-}
-
-export async function DELETE(req: Request) {
-  try {
-    const body = await req.json();
-    const endpoint = body.endpoint ?? body.subscription?.endpoint;
-    if (!endpoint) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-
-    const subs = await readSubs();
-    const filtered = subs.filter((s: any) => {
-      const ep = s?.subscription?.endpoint ?? s?.endpoint;
-      return ep !== endpoint;
+    await prisma.pushSubscription.upsert({
+      where: { endpoint },
+      create: { endpoint, p256dh, auth, userId: session.user.id },
+      update: { p256dh, auth, userId: session.user.id },
     });
 
-    await writeSubs(filtered);
     return NextResponse.json({ ok: true });
-  } catch (error) {
-    console.error("❌ Unsubscribe error:", error);
-    return NextResponse.json({ error: "Failed to unsubscribe" }, { status: 500 });
+  } catch (err) {
+    console.error("Subscribe error:", err);
+    return NextResponse.json({ error: "Internal" }, { status: 500 });
   }
 }
 
-export const dynamic = "force-dynamic";
+// DELETE: Remove a subscription by endpoint (if provided) or all subscriptions for the authenticated user
+export async function DELETE(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const endpoint = body?.endpoint ?? body?.subscription?.endpoint;
+
+    if (endpoint && typeof endpoint === "string") {
+      // Delete only the matching subscription for this user
+      await prisma.pushSubscription.deleteMany({ where: { endpoint, userId: session.user.id } });
+      return NextResponse.json({ ok: true });
+    }
+
+    // No endpoint provided: delete all subscriptions for this user
+    await prisma.pushSubscription.deleteMany({ where: { userId: session.user.id } });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Unsubscribe error:", err);
+    return NextResponse.json({ error: "Internal" }, { status: 500 });
+  }
+}

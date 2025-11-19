@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
@@ -8,30 +8,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
-  id             String           @id @default(cuid())
-  name           String
-  email          String           @unique
-  password       String?
-  role           String           @default("user")
-  coins          Int              @default(0)
-  createdAt      DateTime         @default(now())
-  emailVerified  DateTime?
-  image          String?
-  wins           Int              @default(0)
-  starEligible   Boolean          @default(false)
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  password      String?
+  role          String    @default("user")
+  coins         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  emailVerified DateTime?
+  image         String?
+  wins          Int       @default(0)
+  starEligible  Boolean   @default(false)
 
   // ✅ Relations
-  wallet         Wallet?
-  transactions   Transaction[]
-  teams          TeamMember[]     @relation("TeamMembers")
-  Team           Team[]
-  notifications  Notification[]
-  supportRequests SupportRequest[]
-  accounts       Account[]
-  sessions       Session[]
+  wallet            Wallet?
+  transactions      Transaction[]
+  teams             TeamMember[]       @relation("TeamMembers")
+  Team              Team[]
+  notifications     Notification[]
+  supportRequests   SupportRequest[]
+  pushSubscriptions PushSubscription[]
+  accounts          Account[]
+  sessions          Session[]
 }
 
 model Wallet {
@@ -43,8 +42,6 @@ model Wallet {
   // ✅ Back relation
   user User @relation(fields: [userId], references: [id])
 }
-
- 
 
 model Transaction {
   id          String   @id @default(cuid())
@@ -62,18 +59,18 @@ model Transaction {
 }
 
 model Tournament {
-  id              String   @id @default(cuid())
+  id              String    @id @default(cuid())
   title           String
   mode            String
-  gameType        String   @default("BR")
+  gameType        String    @default("BR")
   entryFee        Int
   prizePool       Int
   description     String?
   startTime       DateTime?
   maxParticipants Int?
-  status          String   @default("upcoming")
-  createdAt       DateTime @default(now())
-  isOpen          Boolean  @default(true)
+  status          String    @default("upcoming")
+  createdAt       DateTime  @default(now())
+  isOpen          Boolean   @default(true)
   lobbyCode       String?
   lobbyPassword   String?
 
@@ -94,10 +91,10 @@ model Team {
 }
 
 model TeamMember {
-  id         String  @id @default(cuid())
-  teamId     String
-  userId     String?
-  role       String  @default("member")
+  id     String  @id @default(cuid())
+  teamId String
+  userId String?
+  role   String  @default("member")
 
   // Optional guest fields
   playerName String?
@@ -105,7 +102,7 @@ model TeamMember {
   gameId     String?
   email      String?
 
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user User? @relation("TeamMembers", fields: [userId], references: [id], onDelete: SetNull)
 }
 
@@ -130,6 +127,18 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Account {

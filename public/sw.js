@@ -60,4 +60,36 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Handle push events
+self.addEventListener('push', (event) => {
+  let payload = { title: 'Notification', body: '' };
+  try {
+    if (event.data) payload = event.data.json();
+  } catch (e) {
+    console.warn('Invalid push payload', e);
+  }
+
+  const options = {
+    body: payload.body,
+    data: payload.data || {},
+    // You can set icon/badge paths here
+  };
+
+  event.waitUntil(self.registration.showNotification(payload.title, options));
+});
+
+// Open app on notification click
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/user/notifications';
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then(windowClients => {
+      for (const client of windowClients) {
+        if (client.url.includes(url) && 'focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow(url);
+    })
+  );
+});
+
 

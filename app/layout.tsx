@@ -6,6 +6,7 @@ import Navbar from "@/components/navbar";
 import ServiceWorkerRegistration from "@/app/components/ServiceWorkerRegistration";
 import SessionGuard from "@/components/SessionGuard";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,8 +38,12 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="ZP Battle Zone" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />
+        <meta name="msapplication-TileColor" content="#eab308" />
+        <meta name="msapplication-TileImage" content="/icons/icon-192.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -51,6 +56,7 @@ export default function RootLayout({
           </SessionGuard>
           <PWAInstallPrompt />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );

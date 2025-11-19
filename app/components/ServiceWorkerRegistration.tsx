@@ -9,7 +9,9 @@ export default function ServiceWorkerRegistration() {
         navigator.serviceWorker
           .register("/sw.js", { scope: "/", updateViaCache: "none" })
           .then((registration) => {
-            console.log("Service Worker registered:", registration.scope);
+            if (process.env.NODE_ENV === "development") {
+              console.log("Service Worker registered:", registration.scope);
+            }
 
             // Force update on page load to get latest version
             registration.update();
