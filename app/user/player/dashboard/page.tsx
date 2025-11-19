@@ -68,7 +68,7 @@ export default async function PlayerDashboardPage() {
                   href={`/user/tournaments/${t.id}`}
                   className="flex-1 text-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
                 >
-                  View card
+                  View Details
                 </a>
                 <a
                   href={`/user/tournaments/${t.id}`}
