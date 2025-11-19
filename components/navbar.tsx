@@ -18,7 +18,9 @@ import {
   User as UserIcon,
   BarChart3
 } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import NotificationBell from "./NotificationBell";
+import SupportBadge from "./SupportBadge";
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -156,6 +158,7 @@ export default function Navbar() {
                   {navItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
                   {navItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
                   {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
+                      {navItem("/admin/support/requests", "Support", <MessageSquare className="w-4 h-4" />)}
                   {navItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
                   {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
                 </>
@@ -164,7 +167,7 @@ export default function Navbar() {
                   {navItem("/user/player/dashboard", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
                   {navItem("/user/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
                   {navItem("/user/leaderboard", "Leaderboard", <Trophy className="w-4 h-4" />)}
-                  {navItem("/user/support", "Support", <Users className="w-4 h-4" />)}
+                  {navItem("/user/support", "Support", <MessageSquare className="w-4 h-4" />)}
                   <div className="relative group">
                     <button className="px-3 py-2 rounded-lg transition-colors text-gray-300 hover:text-white hover:bg-gray-800 flex items-center gap-1">
                       <Wallet className="w-4 h-4" />
@@ -186,6 +189,10 @@ export default function Navbar() {
           <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
             {/* Notification Bell */}
             <NotificationBell />
+            {/* Admin support new count badge */}
+            {isAdmin && (
+              <SupportBadge />
+            )}
 
             {/* User Info (Desktop) */}
             <div className="hidden sm:flex items-center gap-2 lg:gap-3">
@@ -254,7 +261,7 @@ export default function Navbar() {
                 {mobileNavItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
                 {mobileNavItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
                 {mobileNavItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
-                {mobileNavItem("/admin/support/requests", "Support Requests", <Users className="w-4 h-4" />)}
+                {mobileNavItem("/admin/support/requests", "Support Requests", <MessageSquare className="w-4 h-4" />)}
               </>
             ) : (
               <>
@@ -264,7 +271,7 @@ export default function Navbar() {
                 {mobileNavItem("/user/wallet", "My Wallet", <Wallet className="w-4 h-4" />)}
                 {mobileNavItem("/user/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
                 {mobileNavItem("/user/transactions", "Transactions", <History className="w-4 h-4" />)}
-                {mobileNavItem("/user/support", "Support", <Users className="w-4 h-4" />)}
+                {mobileNavItem("/user/support", "Support", <MessageSquare className="w-4 h-4" />)}
               </>
             )}
 

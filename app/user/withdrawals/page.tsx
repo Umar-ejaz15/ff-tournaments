@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { getAllPaymentMethods } from "@/lib/payment-config";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -17,7 +18,8 @@ export default function UserWithdrawalsPage() {
   const { data: withdrawals, mutate } = useSWR(shouldFetch ? "/api/user/transactions?type=withdraw" : null, fetcher, { refreshInterval: 2000 });
 
   const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("EasyPaisa");
+  const allMethods = getAllPaymentMethods();
+  const [method, setMethod] = useState(allMethods[0]?.method || "EasyPaisa");
   const [account, setAccount] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -73,9 +75,10 @@ export default function UserWithdrawalsPage() {
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-sm text-gray-400">Method</span>
-              <select className="bg-gray-800 p-2 rounded-lg" value={method} onChange={(e) => setMethod(e.target.value)}>
-                <option>EasyPaisa</option>
-                <option>NayaPay</option>
+              <select className="bg-gray-800 p-2 rounded-lg" value={method} onChange={(e) => setMethod(e.target.value as any)}>
+                {allMethods.map((pm: any) => (
+                  <option key={pm.method} value={pm.method}>{pm.name}</option>
+                ))}
               </select>
             </label>
             <label className="flex flex-col gap-1">

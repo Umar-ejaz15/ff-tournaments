@@ -27,6 +27,7 @@ type SupportRequest = {
   createdAt: string;
   updatedAt?: string;
   adminResponse?: string;
+  viewed?: boolean;
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -59,6 +60,7 @@ export default function SupportRequestsPage() {
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRequest, setSelectedRequest] = useState<SupportRequest | null>(null);
+  const [markingViewed, setMarkingViewed] = useState<string | null>(null);
   const [adminResponse, setAdminResponse] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -259,7 +261,29 @@ export default function SupportRequestsPage() {
                         ? "border-yellow-500 shadow-lg shadow-yellow-500/20"
                         : "border-gray-700 hover:border-gray-600"
                     }`}
-                    onClick={() => setSelectedRequest(req)}
+                      onClick={async () => {
+                        setSelectedRequest(req);
+                        // If admin opens an unviewed request, mark it as viewed
+                        if (!req.viewed) {
+                          setMarkingViewed(req.id);
+                          try {
+                            await fetch(`/api/support/${req.id}`, {
+                              method: "PATCH",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ viewed: true }),
+                            });
+                          } catch (err) {
+                            console.error("Failed to mark viewed:", err);
+                          } finally {
+                            setMarkingViewed(null);
+                            // update local list
+                            setRequests((prev) => prev.map((r) => (r.id === req.id ? { ...r, viewed: true } : r)));
+                            setFilteredRequests((prev) => prev.map((r) => (r.id === req.id ? { ...r, viewed: true } : r)));
+                            // update selectedRequest object
+                            setSelectedRequest((prev) => prev ? { ...prev, viewed: true } : prev);
+                          }
+                        }
+                      }}
                   >
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex-1 min-w-0">

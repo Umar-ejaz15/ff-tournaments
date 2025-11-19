@@ -91,6 +91,7 @@ export async function GET(req: Request) {
       status: req.status,
       email: req.user.email,
       name: req.user.name,
+      viewed: (req as any).viewed ?? false,
       adminResponse: req.adminResponse,
       createdAt: req.createdAt.toISOString(),
       updatedAt: req.updatedAt.toISOString(),

@@ -22,6 +22,8 @@ export async function PATCH(
     const { id } = await params;
     const body = await req.json();
     const { status, adminResponse } = body;
+    // allow setting viewed flag
+    const { viewed } = body;
 
     // Check if request exists
     const existingRequest = await prisma.supportRequest.findUnique({
@@ -43,6 +45,10 @@ export async function PATCH(
 
     if (adminResponse !== undefined) {
       updateData.adminResponse = adminResponse;
+    }
+
+    if (viewed !== undefined) {
+      updateData.viewed = Boolean(viewed);
     }
 
     // Update the request
@@ -70,6 +76,7 @@ export async function PATCH(
         status: updatedRequest.status,
         email: updatedRequest.user.email,
         name: updatedRequest.user.name,
+        viewed: (updatedRequest as any).viewed ?? false,
         adminResponse: updatedRequest.adminResponse,
         createdAt: updatedRequest.createdAt.toISOString(),
         updatedAt: updatedRequest.updatedAt.toISOString(),

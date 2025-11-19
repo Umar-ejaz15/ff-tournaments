@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { getAllPaymentMethods } from "@/lib/payment-config";
 
 export default function LandingPage() {
   const { data: session, status } = useSession();
@@ -140,12 +141,12 @@ export default function LandingPage() {
             Support for multiple payment methods. Simply send payment, upload proof, and get verified!
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            {["EasyPaisa", "NayaPay"].map((method) => (
+            {getAllPaymentMethods().map((pm) => (
               <div
-                key={method}
+                key={pm.method}
                 className="px-6 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white font-medium"
               >
-                {method}
+                {pm.name}
               </div>
             ))}
           </div>

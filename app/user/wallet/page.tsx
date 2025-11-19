@@ -7,7 +7,7 @@ import Link from "next/link";
 import BuyCoinsModal from "@/app/user/components/BuyCoinsModal";
 import { Wallet, Coins, ArrowLeft, ArrowDownUp, History, Plus, CreditCard, ArrowRight } from "lucide-react";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { getAllPaymentMethods } from "@/lib/payment-config";
+import { getAllPaymentMethods, type PaymentMethod } from "@/lib/payment-config";
 import { pkrToCoinsWithDiscount } from "@/lib/coins-discount";
 
 export default function WalletPage() {
@@ -19,7 +19,9 @@ export default function WalletPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [withAmount, setWithAmount] = useState<string>("");
-  const [withMethod, setWithMethod] = useState<"EasyPaisa" | "NayaPay">("EasyPaisa");
+  const allMethods = getAllPaymentMethods();
+  const defaultWithMethod = (allMethods[0]?.method as PaymentMethod) ?? "EasyPaisa";
+  const [withMethod, setWithMethod] = useState<PaymentMethod>(defaultWithMethod);
   const [withAccount, setWithAccount] = useState<string>("");
   const [withBusy, setWithBusy] = useState(false);
 
@@ -161,7 +163,7 @@ export default function WalletPage() {
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
             <h3 className="text-sm font-semibold text-blue-300 mb-3">Payment Instructions</h3>
             <div className="space-y-2 text-sm text-gray-300 mb-3">
-              <p><strong className="text-blue-300">Methods:</strong> EasyPaisa / NayaPay</p>
+              <p><strong className="text-blue-300">Methods:</strong> {getAllPaymentMethods().map(m=>m.name).join(" / ")}</p>
               <p>After payment, upload screenshot. Admin verifies within 24 hours.</p>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-500/20">
@@ -247,8 +249,9 @@ export default function WalletPage() {
                 value={withMethod}
                 onChange={(e) => setWithMethod(e.target.value as any)}
               >
-                <option>EasyPaisa</option>
-                <option>NayaPay</option>
+                {allMethods.map((pm) => (
+                  <option key={pm.method} value={pm.method}>{pm.name}</option>
+                ))}
               </select>
             </label>
 

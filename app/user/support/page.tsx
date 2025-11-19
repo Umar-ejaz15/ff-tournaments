@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
+// Admin support UI (reuse admin page component so admins see full management UI on /user/support)
+import AdminSupportRequestsPage from "@/app/admin/support/requests/page";
 import { MessageSquare, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 type SupportRequest = {
@@ -16,6 +18,7 @@ type SupportRequest = {
   createdAt: string;
   updatedAt?: string;
   adminResponse?: string;
+  viewed?: boolean;
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -57,10 +60,9 @@ export default function SupportPage() {
     return null;
   }
 
-  // Redirect admins away from user support page
+  // If an admin navigates to the user support route, render the admin support UI in-place
   if (status === "authenticated" && session?.user?.role === "admin") {
-    router.push("/admin");
-    return null;
+    return <AdminSupportRequestsPage />;
   }
 
   async function fetchRequests() {
@@ -139,12 +141,15 @@ export default function SupportPage() {
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-semibold">{req.subject}</h3>
-                          <span className="text-xs px-2 py-1 bg-gray-700 rounded text-gray-300">
-                            {req.category}
-                          </span>
-                        </div>
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <h3 className="text-lg font-semibold">{req.subject}</h3>
+                                      <span className="text-xs px-2 py-1 bg-gray-700 rounded text-gray-300">
+                                        {req.category}
+                                      </span>
+                                      {!req.viewed && (
+                                        <span className="ml-2 inline-block text-xs bg-red-500 text-white px-2 py-0.5 rounded">New</span>
+                                      )}
+                                    </div>
                         <p className="text-sm text-gray-400">
                           Priority: <span className="capitalize">{req.priority}</span>
                         </p>

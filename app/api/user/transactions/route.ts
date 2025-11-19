@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
+import { getAllPaymentMethods } from "@/lib/payment-config";
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +18,8 @@ export async function POST(req: Request) {
     if (amountCoins > 1200) {
       return NextResponse.json({ error: "Maximum withdrawal limit is 1200 coins" }, { status: 400 });
     }
-    if (!method || !["EasyPaisa", "NayaPay"].includes(method)) {
+    const allowed = getAllPaymentMethods().map((m) => m.method);
+    if (!method || !allowed.includes(method)) {
       return NextResponse.json({ error: "Invalid method" }, { status: 400 });
     }
 

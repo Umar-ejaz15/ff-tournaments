@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { pkrToCoinsWithDiscount } from "@/lib/coins-discount";
-import { getAccountNumber, type PaymentMethod } from "@/lib/payment-config";
+import { getAccountNumber, getAllPaymentMethods, type PaymentMethod } from "@/lib/payment-config";
 import { useRouter } from "next/navigation";
 
 export default function BuyCoinsModal({
@@ -13,7 +13,9 @@ export default function BuyCoinsModal({
   initialAmount?: number;
 }) {
   const [pkr, setPkr] = useState<number | "">(initialAmount || "");
-  const [method, setMethod] = useState<PaymentMethod>("EasyPaisa");
+  const allMethods = getAllPaymentMethods();
+  const defaultMethod = (allMethods[0]?.method as PaymentMethod) ?? "EasyPaisa";
+  const [method, setMethod] = useState<PaymentMethod>(defaultMethod);
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofUrl, setProofUrl] = useState("");
   const [useUrlInput, setUseUrlInput] = useState(false);
@@ -173,8 +175,11 @@ export default function BuyCoinsModal({
             onChange={(e) => setMethod(e.target.value as PaymentMethod)}
             className="w-full border p-2 rounded mt-1"
           >
-            <option value="EasyPaisa">EasyPaisa</option>
-            <option value="NayaPay">NayaPay</option>
+            {allMethods.map((pm) => (
+              <option key={pm.method} value={pm.method}>
+                {pm.name}
+              </option>
+            ))}
           </select>
         </label>
 

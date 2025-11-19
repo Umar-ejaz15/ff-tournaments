@@ -175,6 +175,7 @@ model SupportRequest {
   priority      String   @default("medium")
   message       String
   status        String   @default("open")
+  viewed        Boolean  @default(false)
   adminResponse String?
   updatedBy     String?
   createdAt     DateTime @default(now())
