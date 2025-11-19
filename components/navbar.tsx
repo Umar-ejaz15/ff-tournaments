@@ -142,7 +142,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center gap-4">
           {/* Left Section */}
-          <div className="flex items-center gap-4 sm:gap-8 min-w-0">
+          <div className="flex items-center gap-4 sm:gap-8 min-w-0 flex-1">
             <Link
               href={isAdmin ? "/admin" : "/user/player/dashboard"}
               className="text-lg sm:text-xl font-bold text-yellow-400 truncate"
@@ -151,7 +151,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Menu */}
-            <div className="hidden lg:flex gap-2 xl:gap-6">
+            <div className="hidden lg:flex gap-2 xl:gap-6 flex-wrap overflow-x-auto whitespace-nowrap">
               {isAdmin ? (
                 <>
                   {navItem("/admin", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
@@ -186,7 +186,7 @@ export default function Navbar() {
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
             {/* Notification Bell */}
             <NotificationBell />
             {/* Admin support new count badge */}
