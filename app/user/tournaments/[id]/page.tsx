@@ -6,10 +6,13 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, Trophy, Users, Calendar, Coins, Copy, CheckCircle, Key } from "lucide-react";
 import { useState } from "react";
 import { calculatePrizeDistribution } from "@/lib/prize-distribution";
+import { useSession } from "next-auth/react";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function TournamentDetailPage() {
+  const { data: session, status } = useSession();
+  const isAdmin = status === "authenticated" && session?.user?.role === "admin";
   const params = useParams<{ id: string }>();
   const [copied, setCopied] = useState(false);
   const { data, isLoading, error } = useSWR(
@@ -133,7 +136,7 @@ export default function TournamentDetailPage() {
         </div>
 
         {data.lobbyCode && data.isParticipant && (
-          <div className="mb-6 p-6 rounded-xl bg-gradient-to-r from-blue-900/30 to-purple-900/30 border-2 border-blue-500/50 shadow-lg">
+          <div className="mb-6 p-6 rounded-xl bg-linear-to-r from-blue-900/30 to-purple-900/30 border-2 border-blue-500/50 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Key className="w-8 h-8 text-blue-400" />
@@ -219,7 +222,9 @@ export default function TournamentDetailPage() {
                 <tr key={team.id} className="border-b border-gray-800">
                   <td className="p-3 align-top">
                     <div className="font-medium text-white">{team.name}</div>
-                    <div className="text-xs text-gray-500">Team ID: {team.id}</div>
+                    {isAdmin && (
+                      <div className="text-xs text-gray-500">Team ID: {team.id}</div>
+                    )}
                   </td>
                   <td className="p-3 align-top text-center">
                     <span className="inline-block px-2 py-1 bg-gray-800 rounded text-gray-300">
@@ -228,10 +233,10 @@ export default function TournamentDetailPage() {
                   </td>
                   <td className="p-3 align-top">
                     <div className="text-white text-sm">{captain?.playerName || "-"}</div>
-                    {captain?.gameId && (
+                    {isAdmin && captain?.gameId && (
                       <div className="text-xs text-gray-400">ID: {captain.gameId}</div>
                     )}
-                    {captain?.phone && (
+                    {isAdmin && captain?.phone && (
                       <div className="text-xs text-gray-400">{captain.phone}</div>
                     )}
                   </td>
@@ -242,8 +247,8 @@ export default function TournamentDetailPage() {
                           <li key={m.id}>
                             <span className="text-gray-500">{idx + 1}.</span>{" "}
                             <span className="text-white">{m.playerName || "User"}</span>
-                            {m.gameId ? ` • ID: ${m.gameId}` : ""}
-                            {m.phone ? ` • ${m.phone}` : ""}
+                            {isAdmin && m.gameId ? ` • ID: ${m.gameId}` : ""}
+                            {isAdmin && m.phone ? ` • ${m.phone}` : ""}
                           </li>
                         ))}
                       </ul>
