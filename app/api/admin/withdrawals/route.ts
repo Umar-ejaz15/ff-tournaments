@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
+import { sendNotificationToUser } from "@/lib/push";
 
 function unauthorized() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -46,13 +47,11 @@ export async function POST(req: Request) {
       // Mark as approved/paid
       await prisma.transaction.update({ where: { id }, data: { status: "approved" } });
 
-      await prisma.notification.create({
-        data: {
-          userId: tx.userId,
-          type: "withdrawal",
-          message: `Your withdrawal request of ${tx.amountCoins} coins has been approved.`,
-          metadata: { transactionId: id },
-        },
+      // Persist notification and send web-push (do this explicitly instead of relying on Prisma middleware)
+      await sendNotificationToUser(tx.userId, {
+        title: "Withdrawal Approved",
+        body: `Your withdrawal request of ${tx.amountCoins} coins has been approved.`,
+        data: { transactionId: id, type: "withdrawal" },
       });
 
       return NextResponse.json({ success: true });
@@ -65,15 +64,14 @@ export async function POST(req: Request) {
       await prisma.$transaction([
         prisma.transaction.update({ where: { id }, data: { status: "rejected" } }),
         prisma.wallet.update({ where: { userId: tx.userId }, data: { balance: { increment: tx.amountCoins } } }),
-        prisma.notification.create({
-          data: {
-            userId: tx.userId,
-            type: "withdrawal",
-            message: `Your withdrawal of ${tx.amountCoins} coins has been rejected and refunded.`,
-            metadata: { transactionId: id },
-          },
-        }),
       ]);
+
+      // Notify user after DB transaction completes
+      await sendNotificationToUser(tx.userId, {
+        title: "Withdrawal Rejected",
+        body: `Your withdrawal of ${tx.amountCoins} coins has been rejected and refunded.`,
+        data: { transactionId: id, type: "withdrawal" },
+      });
 
       return NextResponse.json({ success: true });
     }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
+import { sendNotificationToUser } from "@/lib/push";
 
 function unauthorized() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -59,14 +60,13 @@ export async function POST(req: Request) {
       await prisma.$transaction(async (txdb) => {
         await txdb.transaction.update({ where: { id }, data: { status: "approved" } });
         await txdb.wallet.update({ where: { userId: tx.userId }, data: { balance: { increment: tx.amountCoins } } });
-        await txdb.notification.create({
-          data: {
-            userId: tx.userId,
-            type: "deposit",
-            message: `Your deposit of ${tx.amountCoins} coins has been approved.`,
-            metadata: { transactionId: id },
-          },
-        });
+      });
+
+      // notify user after DB transaction
+      await sendNotificationToUser(tx.userId, {
+        title: "Deposit Approved",
+        body: `Your deposit of ${tx.amountCoins} coins has been approved.`,
+        data: { transactionId: id, type: "deposit" },
       });
 
       return NextResponse.json({ success: true });
@@ -76,13 +76,11 @@ export async function POST(req: Request) {
       if (tx.status === "rejected") return NextResponse.json({ error: "Already rejected" }, { status: 400 });
 
       await prisma.transaction.update({ where: { id }, data: { status: "rejected" } });
-      await prisma.notification.create({
-        data: {
-          userId: tx.userId,
-          type: "deposit",
-          message: `Your deposit of ${tx.amountCoins} coins has been rejected. Please contact support.`,
-          metadata: { transactionId: id },
-        },
+
+      await sendNotificationToUser(tx.userId, {
+        title: "Deposit Rejected",
+        body: `Your deposit of ${tx.amountCoins} coins has been rejected. Please contact support.`,
+        data: { transactionId: id, type: "deposit" },
       });
 
       return NextResponse.json({ success: true });

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
+import { sendNotificationToUser } from "@/lib/push";
 
 export async function POST(req: Request) {
   try {
@@ -42,18 +43,18 @@ export async function POST(req: Request) {
         await prisma.$transaction([
           prisma.transaction.update({ where: { id: transactionId }, data: { status: "approved" } }),
           prisma.wallet.upsert({
-            where: { userId: transaction.userId },
-            update: { balance: { increment: transaction.amountCoins } },
-            create: { userId: transaction.userId, balance: transaction.amountCoins },
-          }),
-          prisma.notification.create({
-            data: {
-              userId: transaction.userId,
-              type: "deposit",
-              message: `Deposit approved: ${transaction.amountCoins} coins added`,
-            },
-          }),
+              where: { userId: transaction.userId },
+              update: { balance: { increment: transaction.amountCoins } },
+              create: { userId: transaction.userId, balance: transaction.amountCoins },
+            }),
         ]);
+        // Notify user after DB transaction
+        await sendNotificationToUser(transaction.userId, {
+          title: "Deposit Approved",
+          body: `Deposit approved: ${transaction.amountCoins} coins added`,
+          data: { transactionId, type: "deposit" },
+        });
+
         return NextResponse.json({ success: true, message: "Deposit approved and coins added" });
       }
 
@@ -61,14 +62,13 @@ export async function POST(req: Request) {
         // Approve withdrawal (coins already deducted on request)
         await prisma.$transaction([
           prisma.transaction.update({ where: { id: transactionId }, data: { status: "approved" } }),
-          prisma.notification.create({
-            data: {
-              userId: transaction.userId,
-              type: "withdrawal",
-              message: `Your withdrawal of Rs. ${transaction.amountPKR} has been sent.`,
-            },
-          }),
         ]);
+        await sendNotificationToUser(transaction.userId, {
+          title: "Withdrawal Paid",
+          body: `Your withdrawal of Rs. ${transaction.amountPKR} has been sent.`,
+          data: { transactionId, type: "withdrawal" },
+        });
+
         return NextResponse.json({ success: true, message: "Withdrawal marked as paid" });
       }
 
@@ -85,14 +85,13 @@ export async function POST(req: Request) {
             update: { balance: { increment: transaction.amountCoins } },
             create: { userId: transaction.userId, balance: transaction.amountCoins },
           }),
-          prisma.notification.create({
-            data: {
-              userId: transaction.userId,
-              type: "withdrawal",
-              message: `❌ Withdrawal rejected. ${transaction.amountCoins} coins refunded to wallet.`,
-            },
-          }),
         ]);
+        await sendNotificationToUser(transaction.userId, {
+          title: "Withdrawal Rejected",
+          body: `❌ Withdrawal rejected. ${transaction.amountCoins} coins refunded to wallet.`,
+          data: { transactionId, type: "withdrawal" },
+        });
+
         return NextResponse.json({ success: true, message: "Withdrawal rejected and refunded" });
       }
 

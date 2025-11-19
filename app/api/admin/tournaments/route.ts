@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { broadcastNotificationToUsers } from "@/lib/push";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -183,24 +184,19 @@ export async function PUT(req: Request) {
 
       const tournamentFull = await prisma.tournament.findUnique({ where: { id } });
 
-      await prisma.$transaction(
-        Array.from(allUserIds).map((userId) =>
-          prisma.notification.create({
-            data: {
-              userId,
-              type: lobbyCodeChanged ? "start" : "reminder",
-              message: lobbyCodeChanged
-                ? `Room Code available for "${tournamentFull?.title || "tournament"}": ${newLobbyCode} — Join now!`
-                : `Reminder: Your match "${tournamentFull?.title || "tournament"}" starts soon. Get ready!`,
-              metadata: {
-                tournamentId: id,
-                lobbyCode: lobbyCodeChanged ? newLobbyCode : null,
-                tournamentTitle: tournamentFull?.title,
-              },
-            },
-          })
-        )
-      );
+      // Notify all team members (persist + push) via helper
+      await broadcastNotificationToUsers(Array.from(allUserIds), {
+        title: lobbyCodeChanged ? "Room Code Available" : "Tournament Reminder",
+        body: lobbyCodeChanged
+          ? `Room Code available for "${tournamentFull?.title || "tournament"}": ${newLobbyCode} — Join now!`
+          : `Reminder: Your match "${tournamentFull?.title || "tournament"}" starts soon. Get ready!`,
+        data: {
+          tournamentId: id,
+          lobbyCode: lobbyCodeChanged ? newLobbyCode : null,
+          tournamentTitle: tournamentFull?.title,
+          type: lobbyCodeChanged ? "start" : "reminder",
+        },
+      });
     }
 
     return NextResponse.json(tournament);

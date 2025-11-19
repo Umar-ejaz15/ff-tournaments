@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
+import { broadcastNotificationToUsers } from "@/lib/push";
 
 export async function GET() {
   try {
@@ -51,19 +52,12 @@ export async function POST(req: Request) {
       targetUsers = admins.map((u) => u.id);
     }
 
-    // Create notifications for all target users
-    await prisma.$transaction(
-      targetUsers.map((userId) =>
-        prisma.notification.create({
-          data: {
-            userId,
-            type: type || "announcement",
-            message: `${title}: ${message}`,
-            metadata: { announcement: true, type, targetAudience },
-          },
-        })
-      )
-    );
+    // Create notifications and send pushes to all target users via helper
+    await broadcastNotificationToUsers(targetUsers, {
+      title: title,
+      body: message,
+      data: { announcement: true, type, targetAudience },
+    });
 
     return NextResponse.json({ success: true, notified: targetUsers.length });
   } catch (error) {
