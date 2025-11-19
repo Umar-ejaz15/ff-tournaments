@@ -38,7 +38,7 @@ export default function LandingPage() {
           transition={{ duration: 0.6 }}
           className="text-5xl md:text-7xl font-extrabold mb-6 text-yellow-400"
         >
-          Free Fire Championship 2025
+          ZP Battle Zone Championship 2025
         </motion.h1>
 
         <motion.p
@@ -47,7 +47,7 @@ export default function LandingPage() {
           transition={{ delay: 0.3 }}
           className="text-gray-300 max-w-3xl text-xl mb-4"
         >
-          Join the ultimate Free Fire tournament platform. Compete in Solo, Duo, and Squad battles.
+          Join the ultimate ZP Battle Zone tournament platform. Compete in Solo, Duo, and Squad battles.
         </motion.p>
         <motion.p
           initial={{ opacity: 0 }}
@@ -77,7 +77,7 @@ export default function LandingPage() {
       <section className="py-24 px-6 bg-gray-950 border-t border-gray-800">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12 text-white">
-            Why Choose FF Tournaments?
+            Why Choose ZP Battle Zone?
           </h2>
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <FeatureCard
@@ -154,7 +154,7 @@ export default function LandingPage() {
 
       {/* --- Footer --- */}
       <footer className="py-8 text-center border-t border-gray-800 text-gray-500 text-sm">
-        © {new Date().getFullYear()} FF Tournaments • Powered by Next.js & Prisma
+        © {new Date().getFullYear()} ZP Battle Zone • Powered by Next.js & Prisma
       </footer>
     </div>
   );

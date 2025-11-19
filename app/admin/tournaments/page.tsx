@@ -27,6 +27,8 @@ export default function AdminTournamentsPage() {
     prizePool: "",
     startTime: "",
     maxParticipants: "",
+    lobbyCode: "",
+    lobbyPassword: "",
   });
   const [busy, setBusy] = useState(false);
   const [errMessage, setErrMessage] = useState<string | null>(null);
@@ -41,6 +43,8 @@ export default function AdminTournamentsPage() {
         entryFee: Number(form.entryFee) || 0,
         prizePool: Number(form.prizePool) || 0,
         maxParticipants: Number(form.maxParticipants) || 0,
+        lobbyCode: form.lobbyCode?.trim() || undefined,
+        lobbyPassword: form.lobbyPassword || undefined,
       };
 
       const res = await fetch("/api/admin/tournaments", {
@@ -59,6 +63,8 @@ export default function AdminTournamentsPage() {
         prizePool: "",
         startTime: "",
         maxParticipants: "",
+        lobbyCode: "",
+        lobbyPassword: "",
       });
     } catch (err: any) {
       setErrMessage(err.message);
@@ -208,6 +214,26 @@ export default function AdminTournamentsPage() {
             />
           </label>
 
+          <label className="flex flex-col gap-1">
+            <span className="text-sm text-gray-400">Room ID / Lobby Code (optional)</span>
+            <input
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg outline-none focus:border-yellow-500/50"
+              placeholder="e.g. ROOM123"
+              value={form.lobbyCode}
+              onChange={(e) => setForm((s) => ({ ...s, lobbyCode: e.target.value }))}
+            />
+          </label>
+
+          <label className="flex flex-col gap-1">
+            <span className="text-sm text-gray-400">Room Password (optional)</span>
+            <input
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg outline-none focus:border-yellow-500/50"
+              placeholder="Optional password"
+              value={form.lobbyPassword}
+              onChange={(e) => setForm((s) => ({ ...s, lobbyPassword: e.target.value }))}
+            />
+          </label>
+
           <div className="flex items-end">
             <button
               type="submit"
@@ -310,6 +336,24 @@ export default function AdminTournamentsPage() {
                       {(t as any).lobbyCode && (
                         <p className="text-xs text-green-400 mt-1">Active: {(t as any).lobbyCode}</p>
                       )}
+                      <div className="mt-2">
+                        <input
+                          defaultValue={(t as any).lobbyPassword || ""}
+                          placeholder="Room password (optional)"
+                          className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg text-sm w-36 focus:border-yellow-500/50 focus:outline-none"
+                          onBlur={async (e) => {
+                            const v = e.currentTarget.value;
+                            if (v !== (t as any).lobbyPassword) {
+                              try {
+                                await updateTournament(t.id, { lobbyPassword: v || null });
+                                alert("✅ Lobby password updated.");
+                              } catch (err: any) {
+                                alert("❌ Lobby password update failed: " + err.message);
+                              }
+                            }
+                          }}
+                        />
+                      </div>
                     </td>
                     <td className="p-3">
                       <button

@@ -2,22 +2,6 @@
 
 import React from "react";
 
-export default function DashboardClient() {
-  return (
-    <div className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-lg sm:text-xl font-semibold">Quick actions</h2>
-          <p className="text-xs sm:text-sm text-gray-400">Enable features and shortcuts for your account</p>
-        </div>
-        <div className="w-full sm:w-auto">
-          <PushSubscriptionControl />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -29,7 +13,7 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
-function PushSubscriptionControl() {
+export default function PushSubscriptionControl() {
   const [isSupported, setIsSupported] = React.useState(false);
   const [isSubscribed, setIsSubscribed] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -60,7 +44,6 @@ function PushSubscriptionControl() {
         return;
       }
 
-      // request permission if not granted
       if (Notification.permission !== 'granted') {
         const perm = await Notification.requestPermission();
         if (perm !== 'granted') {
@@ -79,7 +62,6 @@ function PushSubscriptionControl() {
         applicationServerKey,
       } as any);
 
-      // send to server
       const res = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,11 +99,11 @@ function PushSubscriptionControl() {
   }
 
   if (!isSupported) {
-    return <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4"><p className="text-gray-400 text-sm">Push notifications not supported on this device or browser.</p></div>;
+    return <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-3"><p className="text-gray-400 text-sm">Push not supported</p></div>;
   }
 
   return (
-    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
+    <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4 mb-4">
       <p className="text-sm text-gray-300 mb-2">Mobile push notifications</p>
       {message && <p className="text-xs text-gray-400 mb-2">{message}</p>}
       <button

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getToken } from "next-auth/jwt";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -33,6 +34,22 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       },
     });
 
+    // Get user id from NextAuth JWT token (works for `session.strategy = 'jwt'`)
+    let userId: string | null = null;
+    try {
+      const token = (await getToken({ req: request as any, secret: process.env.NEXTAUTH_SECRET })) as any;
+      // Our `jwt` callback attaches `id` to the token
+      userId = typeof token?.id === "string" ? token.id : null;
+    } catch (e) {
+      userId = null;
+    }
+
+    // Check if user is a participant
+    let isParticipant = false;
+    if (userId) {
+      isParticipant = teams.some(team => team.members.some(member => member.userId === userId));
+    }
+
     const payload = {
       id: tournamentBase.id,
       title: tournamentBase.title,
@@ -46,7 +63,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       status: tournamentBase.status,
       createdAt: tournamentBase.createdAt,
       isOpen: tournamentBase.isOpen,
-      lobbyCode: (tournamentBase as any).lobbyCode ?? null,
+      lobbyCode: isParticipant ? (tournamentBase as any).lobbyCode ?? null : null,
+      lobbyPassword: isParticipant ? (tournamentBase as any).lobbyPassword ?? null : null,
+      isParticipant,
       _count: tournamentBase._count,
       winners: tournamentBase.winners,
       teams: teams.map((t) => ({

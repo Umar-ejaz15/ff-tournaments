@@ -1,6 +1,6 @@
-# FF Tournaments
+# ZP Battle Zone
 
-A tournament management platform for Free Fire built with Next.js, NextAuth, Prisma, and PostgreSQL.
+A tournament management platform (ZP Battle Zone) built with Next.js, NextAuth, Prisma, and PostgreSQL.
 
 ## 🚀 Getting Started
 
@@ -15,7 +15,7 @@ A tournament management platform for Free Fire built with Next.js, NextAuth, Pri
 1. Clone the repository
 ```bash
 git clone <your-repo-url>
-cd ff-tournaments
+cd zp-battle-zone
 ```
 
 2. Install dependencies

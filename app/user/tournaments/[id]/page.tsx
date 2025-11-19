@@ -132,7 +132,7 @@ export default function TournamentDetailPage() {
           })()}
         </div>
 
-        {data.lobbyCode && (
+        {data.lobbyCode && data.isParticipant && (
           <div className="mb-6 p-6 rounded-xl bg-gradient-to-r from-blue-900/30 to-purple-900/30 border-2 border-blue-500/50 shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -164,6 +164,33 @@ export default function TournamentDetailPage() {
             </div>
             <p className="text-xs text-gray-400 mt-3">
               ⚠️ Join the room using this code. Match will start soon!
+            </p>
+          </div>
+        )}
+
+        {data.lobbyPassword && (
+          <div className="mb-6 p-6 rounded-xl bg-linear-to-r from-red-900/30 to-orange-900/30 border-2 border-red-500/50 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Key className="w-8 h-8 text-red-400" />
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">Room Password</p>
+                  <p className="text-2xl font-bold text-white font-mono tracking-wider">
+                    {data.lobbyPassword}
+                    <span className="ml-2 text-lg text-green-400 animate-pulse">●</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => navigator.clipboard.writeText(data.lobbyPassword)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+              >
+                <Copy className="w-4 h-4" />
+                Copy
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-3">
+              ⚠️ Use this password to join the room.
             </p>
           </div>
         )}

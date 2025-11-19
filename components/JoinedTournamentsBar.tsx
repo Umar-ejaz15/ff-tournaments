@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Trophy, Users } from "lucide-react";
 
 export default function JoinedTournamentsBar({ user }: { user: any }) {
+  // The server should provide `user.teams` in newest-first order. Use that order
+  // and avoid client-side date sorting (TeamMember doesn't currently have timestamps).
   const teams = user?.teams ?? [];
   const count = teams.length;
   const preview = teams.slice(0, 3).map((tm: any) => tm.team?.tournament?.title || tm.team?.name || "Team");

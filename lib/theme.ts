@@ -1,5 +1,5 @@
 /**
- * Consistent Color Theme for FF Tournaments
+ * Consistent Color Theme for ZP Battle Zone
  * 
  * Primary Colors:
  * - Accent: Yellow-400 (main brand color)

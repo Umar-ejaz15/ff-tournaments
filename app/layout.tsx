@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Free FIre Tournament | FF Tournament| Pakistan",
-  description: "Free Fire Tournament | FF Tournament | Pakistan",
+  title: "ZP Battle Zone",
+  description: "ZP Battle Zone - Tournaments, Wallet, and Notifications",
 };
 
 export default function RootLayout({
@@ -36,7 +36,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="FF Tournaments" />
+        <meta name="apple-mobile-web-app-title" content="ZP Battle Zone" />
         <link rel="apple-touch-icon" href="/favicon.ico" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>

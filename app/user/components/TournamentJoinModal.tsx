@@ -288,7 +288,7 @@ export default function TournamentJoinModal({
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1">Free Fire Game ID *</label>
+                <label className="block text-xs text-gray-400 mb-1">Free Fire ID *</label>
                 <input
                   type="text"
                   value={captain.gameId}
@@ -361,7 +361,7 @@ export default function TournamentJoinModal({
                         />
                       </div>
                       <div>
-                        <label className="block text-xs text-gray-400 mb-1">Free Fire Game ID *</label>
+                        <label className="block text-xs text-gray-400 mb-1">Free Fire ID *</label>
                         <input
                           type="text"
                           value={member.gameId}

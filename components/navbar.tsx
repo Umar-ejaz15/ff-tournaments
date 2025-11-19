@@ -67,7 +67,7 @@ export default function Navbar() {
       <nav className="bg-gray-900 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 flex justify-between h-16 items-center">
           <Link href="/" className="text-xl font-bold text-yellow-400">
-            FF Tournaments
+            ZP Battle Zone
           </Link>
           <div className="flex gap-4">
             <Link
@@ -145,7 +145,7 @@ export default function Navbar() {
               href={isAdmin ? "/admin" : "/user/player/dashboard"}
               className="text-lg sm:text-xl font-bold text-yellow-400 truncate"
             >
-              FF Tournaments
+              ZP Battle Zone
             </Link>
 
             {/* Desktop Menu */}

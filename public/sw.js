@@ -1,5 +1,5 @@
-// Service Worker for FF Tournaments PWA
-const CACHE_NAME = 'ff-tournaments-v3';
+// Service Worker for ZP Battle Zone PWA
+const CACHE_NAME = 'zp-battle-zone-v3';
 const urlsToCache = [
   '/',
   '/manifest.json'

@@ -75,6 +75,7 @@ model Tournament {
   createdAt       DateTime @default(now())
   isOpen          Boolean  @default(true)
   lobbyCode       String?
+  lobbyPassword   String?
 
   winners Winner[]
   teams   Team[]   @relation("TournamentTeams")

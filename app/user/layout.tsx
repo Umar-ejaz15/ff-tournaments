@@ -58,7 +58,7 @@ async function UserLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <JoinedTournamentsBar user={user} />
+        {/* Joined tournaments moved to the Player Dashboard page to avoid duplication */}
         <div className="mt-4 sm:mt-6">{children}</div>
       </div>
     </div>

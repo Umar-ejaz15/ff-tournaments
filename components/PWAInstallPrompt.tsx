@@ -101,7 +101,7 @@ export default function PWAInstallPrompt() {
               <Download className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-lg mb-1">Install FF Tournaments</h3>
+              <h3 className="font-bold text-lg mb-1">Install ZP Battle Zone</h3>
               <p className="text-sm text-black/80 mb-3">
                 Add to your home screen for quick access!
               </p>
@@ -135,7 +135,7 @@ export default function PWAInstallPrompt() {
         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4" onClick={() => setShowInstructions(false)}>
           <div className="bg-gray-900 rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-800" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-white">Install App</h3>
+              <h3 className="text-xl font-bold text-white">Install ZP Battle Zone</h3>
               <button
                 onClick={(e) => {
                   e.preventDefault();

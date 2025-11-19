@@ -84,7 +84,7 @@ export default function TournamentsPage() {
                 <Trophy className="w-6 h-6 sm:w-8 sm:h-8" />
                 Tournaments
               </h1>
-              <p className="text-gray-400 text-sm sm:text-base">Join Free Fire tournaments and compete for prizes!</p>
+              <p className="text-gray-400 text-sm sm:text-base">Join ZP Battle Zone tournaments and compete for prizes!</p>
             </div>
             <div className="text-right bg-gray-900/50 border border-gray-800 rounded-xl p-3 sm:p-4 w-full sm:w-auto">
               <p className="text-xs sm:text-sm text-gray-400 flex items-center gap-1 mb-1">
@@ -248,8 +248,11 @@ export default function TournamentsPage() {
                   <p className="text-gray-400 text-xs sm:text-sm mb-4 line-clamp-2">{tournament.description}</p>
                 )}
 
-                <div className="flex items-center justify-between mb-3">
-                  <Link href={`/user/tournaments/${tournament.id}`} className="text-blue-400 hover:text-blue-300 text-xs sm:text-sm">
+                <div className="mb-3">
+                  <Link
+                    href={`/user/tournaments/${tournament.id}`}
+                    className="w-full block text-center py-2 sm:py-3 rounded-lg font-semibold text-xs sm:text-sm transition-colors bg-blue-600 hover:bg-blue-500 text-white"
+                  >
                     View details
                   </Link>
                 </div>

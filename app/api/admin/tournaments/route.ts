@@ -43,7 +43,9 @@ export async function POST(req: Request) {
       prizePool,
       description,
       startTime,
-      maxParticipants,
+        maxParticipants,
+        lobbyCode,
+        lobbyPassword,
     } = body as any;
 
     if (!title || !mode || !gameType || entryFee === undefined || prizePool === undefined) {
@@ -85,6 +87,8 @@ export async function POST(req: Request) {
         startTime: startTime ? new Date(startTime) : null,
         maxParticipants: maxParticipants ? Number(maxParticipants) : null,
         status: "upcoming",
+        lobbyCode: lobbyCode ? String(lobbyCode) : undefined,
+        lobbyPassword: lobbyPassword ? String(lobbyPassword) : undefined,
       },
     });
 
@@ -106,27 +110,68 @@ export async function PUT(req: Request) {
     if (!id) return NextResponse.json({ error: "Tournament ID required" }, { status: 400 });
 
     const prev = await prisma.tournament.findUnique({ where: { id } });
-    const tournament = await prisma.tournament.update({
-      where: { id },
-      data: {
-        ...updateData,
-        status: status ?? undefined,
-        startTime: startTime ? new Date(startTime) : undefined,
-      },
-    });
+
+    // Only allow updating known fields to avoid Prisma unknown-arg errors
+    const allowed = [
+      "title",
+      "mode",
+      "gameType",
+      "entryFee",
+      "prizePool",
+      "description",
+      "maxParticipants",
+      "lobbyCode",
+      "lobbyPassword",
+      "isOpen",
+      "status",
+    ];
+
+    const dataToUpdate: any = {};
+    for (const key of allowed) {
+      if (Object.prototype.hasOwnProperty.call(updateData, key)) {
+        dataToUpdate[key] = updateData[key];
+      }
+    }
+
+    // Handle explicit status/startTime passed separately
+    if (typeof status !== "undefined") dataToUpdate.status = status;
+    if (typeof startTime !== "undefined") dataToUpdate.startTime = startTime ? new Date(startTime) : null;
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      console.warn("No valid fields provided for update", { id, updateData });
+      return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
+    }
+
+    // Normalize lobbyPassword: convert empty string to null to avoid DB issues
+    if (Object.prototype.hasOwnProperty.call(dataToUpdate, "lobbyPassword")) {
+      const val = dataToUpdate.lobbyPassword;
+      if (val === "" || typeof val === "undefined") dataToUpdate.lobbyPassword = null;
+      else dataToUpdate.lobbyPassword = String(val);
+    }
+
+    console.log("Updating tournament", { id, dataToUpdate });
+
+    let tournament;
+    try {
+      tournament = await prisma.tournament.update({ where: { id }, data: dataToUpdate });
+    } catch (err: any) {
+      console.error("Prisma update error for tournament", id, err);
+      // Prisma 'not found' error code
+      if (err?.code === "P2025") {
+        return NextResponse.json({ error: `Tournament not found: ${id}` }, { status: 404 });
+      }
+      throw err; // rethrow to be handled by outer catch
+    }
 
     // Fire notifications when lobby code is set or status becomes running
     const prevLobbyCode = prev?.lobbyCode || "";
-    const newLobbyCode = updateData.lobbyCode || "";
+    const newLobbyCode = (dataToUpdate.lobbyCode as string) || "";
     const lobbyCodeChanged = newLobbyCode !== "" && newLobbyCode !== prevLobbyCode;
-    const shouldNotifyStart = (status && status === "running") || lobbyCodeChanged;
-    
+    const shouldNotifyStart = (dataToUpdate.status && dataToUpdate.status === "running") || lobbyCodeChanged;
+
     if (shouldNotifyStart) {
-      const teams = await prisma.team.findMany({ 
-        where: { tournamentId: id },
-        include: { members: true }
-      });
-      
+      const teams = await prisma.team.findMany({ where: { tournamentId: id }, include: { members: true } });
+
       // Notify all team members (not just captains)
       const allUserIds = new Set<string>();
       teams.forEach((team) => {
@@ -136,8 +181,8 @@ export async function PUT(req: Request) {
         });
       });
 
-      const tournament = await prisma.tournament.findUnique({ where: { id } });
-      
+      const tournamentFull = await prisma.tournament.findUnique({ where: { id } });
+
       await prisma.$transaction(
         Array.from(allUserIds).map((userId) =>
           prisma.notification.create({
@@ -145,12 +190,12 @@ export async function PUT(req: Request) {
               userId,
               type: lobbyCodeChanged ? "start" : "reminder",
               message: lobbyCodeChanged
-                ? `Room Code available for "${tournament?.title || "tournament"}": ${newLobbyCode} — Join now!`
-                : `Reminder: Your match "${tournament?.title || "tournament"}" starts soon. Get ready!`,
-              metadata: { 
-                tournamentId: id, 
+                ? `Room Code available for "${tournamentFull?.title || "tournament"}": ${newLobbyCode} — Join now!`
+                : `Reminder: Your match "${tournamentFull?.title || "tournament"}" starts soon. Get ready!`,
+              metadata: {
+                tournamentId: id,
                 lobbyCode: lobbyCodeChanged ? newLobbyCode : null,
-                tournamentTitle: tournament?.title
+                tournamentTitle: tournamentFull?.title,
               },
             },
           })
@@ -159,9 +204,10 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json(tournament);
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error updating tournament:", error);
-    return NextResponse.json({ error: "Failed to update tournament" }, { status: 500 });
+    const msg = error?.message || String(error) || "Failed to update tournament";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
 

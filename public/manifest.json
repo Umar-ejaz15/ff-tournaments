@@ -1,7 +1,7 @@
 {
-  "name": "FF Tournaments",
-  "short_name": "FF Tournaments",
-  "description": "Free Fire Tournament Platform - Join tournaments, compete, and win prizes",
+  "name": "ZP Battle Zone",
+  "short_name": "ZP Battle Zone",
+  "description": "ZP Battle Zone - Join tournaments, compete, and win prizes",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
