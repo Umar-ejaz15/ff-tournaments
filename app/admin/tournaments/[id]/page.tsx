@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { useParams, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Trophy, Medal, Award, Users, User, Phone, Mail, CheckCircle, Radio } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -23,6 +23,13 @@ export default function AdminTournamentDetailPage() {
   const winners = useMemo(() => (data?.winners ?? []) as any[], [data]);
   const takenPlacements = useMemo(() => winners.map((w: any) => w.placement), [winners]);
   const availablePlacements = [1, 2, 3].filter((p) => !takenPlacements.includes(p));
+
+  // Ensure selectedPlacement is valid when availablePlacements change
+  useEffect(() => {
+    if (!availablePlacements.includes(selectedPlacement)) {
+      setSelectedPlacement((availablePlacements[0] as 1 | 2 | 3) ?? 1);
+    }
+  }, [availablePlacements]);
 
   async function declareWinner(teamId: string, placement: 1 | 2 | 3) {
     const placementText = placement === 1 ? "1st (Top 1)" : placement === 2 ? "2nd (Top 2)" : "3rd (Top 3)";
@@ -162,7 +169,12 @@ export default function AdminTournamentDetailPage() {
                             type="radio"
                             name="winner"
                             checked={selectedTeamId === team.id}
-                            onChange={() => setSelectedTeamId(team.id)}
+                            onChange={() => {
+                              setSelectedTeamId(team.id);
+                              // default the placement to the first available when selecting a team
+                              const defaultPlacement = (availablePlacements && availablePlacements.length > 0) ? (availablePlacements[0] as 1 | 2 | 3) : 1;
+                              setSelectedPlacement(defaultPlacement);
+                            }}
                             className="sr-only"
                           />
                           <span className="text-sm text-gray-300">Select</span>

@@ -3,8 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 
-// Cache leaderboard for 30 seconds, allow stale for 2 minutes
-export const revalidate = 30;
+// This route uses `getServerSession` (uses headers) so force runtime execution
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
