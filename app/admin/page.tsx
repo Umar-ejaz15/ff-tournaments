@@ -43,16 +43,16 @@ export default async function AdminPanal() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6 sm:mb-8">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white p-6 sm:p-10 lg:p-12">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8 sm:mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-yellow-400">Admin Dashboard</h1>
-          <p className="text-gray-400 text-sm sm:text-lg">Welcome back, {session.user.name}!</p>
+          <p className="text-gray-400 text-sm sm:text-base">Welcome back, {session.user.name}!</p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 sm:p-6 hover:border-yellow-500/50 transition-all">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8">
+          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 sm:p-6 hover:border-yellow-500/50 transition-all min-h-[88px]">
             <div className="flex items-center justify-between mb-2">
               <div className="text-gray-400 text-xs sm:text-sm">Total Users</div>
               <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 shrink-0" />
@@ -90,76 +90,76 @@ export default async function AdminPanal() {
         </div>
 
         {/* Quick Actions & System Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8">
           {/* Quick Actions */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 sm:p-6">
+          <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-5 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4 text-yellow-400 flex items-center gap-2">
               <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
               Quick Actions
             </h2>
-            <div className="space-y-2 sm:space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Link
                 href="/admin/users"
-                className="flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-semibold text-sm sm:text-base"
+                className="flex items-center justify-start gap-3 w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-semibold text-sm"
               >
                 <Users className="w-4 h-4" />
-                Manage Users
+                <span>Manage Users</span>
               </Link>
               <Link
                 href="/admin/transactions"
-                className="flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 rounded-lg transition-colors font-semibold text-sm sm:text-base"
+                className="flex items-center justify-start gap-3 w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors font-semibold text-sm"
               >
                 <Receipt className="w-4 h-4" />
-                Review Payments
+                <span>Review Payments</span>
               </Link>
               <Link
                 href="/admin/tournaments"
-                className="flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-2 sm:py-3 bg-yellow-500 hover:bg-yellow-400 text-black rounded-lg transition-colors font-semibold text-sm sm:text-base"
+                className="flex items-center justify-start gap-3 w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black rounded-lg transition-colors font-semibold text-sm"
               >
                 <Trophy className="w-4 h-4" />
-                Manage Tournaments
+                <span>Manage Tournaments</span>
               </Link>
               <Link
                 href="/admin/statistics"
-                className="flex items-center justify-center gap-2 w-full px-4 sm:px-6 py-2 sm:py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors font-semibold text-sm sm:text-base"
+                className="flex items-center justify-start gap-3 w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors font-semibold text-sm"
               >
                 <TrendingUp className="w-4 h-4" />
-                View Statistics
+                <span>View Statistics</span>
               </Link>
             </div>
           </div>
 
           {/* System Info */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 sm:p-6">
+          <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-5 sm:p-6">
             <h2 className="text-lg sm:text-xl font-bold mb-4 text-yellow-400 flex items-center gap-2">
               <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
               System Info
             </h2>
-            <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+            <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-gray-400 flex items-center gap-2">
-                  <Users className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                  <Users className="w-4 h-4 shrink-0" />
                   Total Users:
                 </span>
                 <span className="text-white font-medium">{totalUsers}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-400 flex items-center gap-2">
-                  <UserCog className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                  <UserCog className="w-4 h-4 shrink-0" />
                   Admin Users:
                 </span>
                 <span className="text-yellow-400 font-medium">{totalAdminUsers}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-400 flex items-center gap-2">
-                  <Receipt className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                  <Receipt className="w-4 h-4 shrink-0" />
                   Total Transactions:
                 </span>
                 <span className="text-white font-medium">{totalTransactions}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-400 flex items-center gap-2">
-                  <Trophy className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                  <Trophy className="w-4 h-4 shrink-0" />
                   Tournaments:
                 </span>
                 <span className="text-white font-medium">{totalTournaments}</span>
