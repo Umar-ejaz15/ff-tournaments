@@ -4,9 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgres"
   // Prisma v7+ no longer supports `url` in schema files.
-  // Move connection settings to `prisma.config.ts` or pass them to PrismaClient per https://pris.ly/d/config-datasource
+  // Move connection settings to `prisma.config.cjs` or pass them to PrismaClient per https://pris.ly/d/config-datasource
   // For local development you can still use environment variables via a Prisma config file.
 }
 
