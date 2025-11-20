@@ -15,7 +15,7 @@ if (process.env.DATABASE_URL) {
   // Pass adapter when a direct DB URL is available.
   // Use `any` so this file remains compatible with multiple Prisma versions.
   prismaClientOptions.adapter = {
-    provider: "postgresql",
+    provider: "postgres",
     url: process.env.DATABASE_URL,
   };
 }
