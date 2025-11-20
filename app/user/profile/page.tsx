@@ -204,7 +204,7 @@ export default async function ProfilePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {user.transactions.map((tx) => (
+                  {user.transactions.map((tx: any) => (
                     <tr key={tx.id} className="border-b border-gray-800 hover:bg-gray-800/30">
                       <td className="py-3 px-4 text-white text-sm">
                         {new Date(tx.createdAt).toLocaleDateString()}
@@ -247,11 +247,11 @@ export default async function ProfilePage() {
         </div>
 
         {/* Payment Verification Notice */}
-        {user?.transactions && user.transactions.some((tx) => tx.status === "pending") && (
+        {user?.transactions && user.transactions.some((tx: any) => tx.status === "pending") && (
           <div className="mt-6 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
             <h3 className="text-lg font-bold text-yellow-400 mb-2">⏳ Pending Payments</h3>
             <p className="text-gray-300 text-sm">
-              You have {user.transactions.filter((tx) => tx.status === "pending").length} pending
+              You have {user.transactions.filter((tx: any) => tx.status === "pending").length} pending
               payment(s) awaiting admin verification. Your coins will be added automatically once approved.
             </p>
           </div>

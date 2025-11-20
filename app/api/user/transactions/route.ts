@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Insufficient balance" }, { status: 400 });
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // Deduct immediately to prevent double spending
       await tx.wallet.update({ where: { userId: user.id }, data: { balance: { decrement: amountCoins } } });
 

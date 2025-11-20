@@ -34,8 +34,8 @@ export async function GET() {
       select: { amountPKR: true },
     });
 
-    const totalRevenue = approvedTransactions.reduce((sum, tx) => sum + tx.amountPKR, 0);
-    const totalCoinsInCirculation = wallets.reduce((sum, w) => sum + w.balance, 0);
+    const totalRevenue = approvedTransactions.reduce((sum: number, tx: any) => sum + tx.amountPKR, 0);
+    const totalCoinsInCirculation = wallets.reduce((sum: number, w: any) => sum + w.balance, 0);
 
     return NextResponse.json({
       totalUsers,

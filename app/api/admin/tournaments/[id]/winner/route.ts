@@ -72,7 +72,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     const tid = tournamentId as string;
 
     // ✅ Transaction — record winner, update tournament, credit wallet, track wins, check bonuses, and notify
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // Record winner
       await tx.winner.create({
         data: {

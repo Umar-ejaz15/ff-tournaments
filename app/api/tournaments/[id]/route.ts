@@ -47,7 +47,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     // Check if user is a participant
     let isParticipant = false;
     if (userId) {
-      isParticipant = teams.some(team => team.members.some(member => member.userId === userId));
+      isParticipant = teams.some((team: any) => team.members.some((member: any) => member.userId === userId));
     }
 
     const payload = {
@@ -68,12 +68,12 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       isParticipant,
       _count: tournamentBase._count,
       winners: tournamentBase.winners,
-      teams: teams.map((t) => ({
+      teams: teams.map((t: any) => ({
         id: t.id,
         name: t.name,
         captainId: t.captainId,
         tournamentId: t.tournamentId,
-        members: t.members.map((m) => ({
+        members: t.members.map((m: any) => ({
           id: m.id,
           userId: m.userId,
           role: m.role,

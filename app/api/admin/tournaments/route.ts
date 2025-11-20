@@ -102,7 +102,7 @@ export async function POST(req: Request) {
     // Notify ALL non-admin users about the new tournament (persist + web-push)
     try {
       const users = await prisma.user.findMany({ where: { role: "user" }, select: { id: true } });
-      const userIds = users.map((u) => u.id);
+      const userIds = users.map((u: any) => u.id);
       const startTimeStr = tournament.startTime ? new Date(tournament.startTime).toLocaleString() : null;
       if (userIds.length > 0) {
         await broadcastNotificationToUsers(userIds, {
@@ -207,9 +207,9 @@ export async function PUT(req: Request) {
 
       // Notify all team members (not just captains)
       const allUserIds = new Set<string>();
-      teams.forEach((team) => {
+      teams.forEach((team: any) => {
         allUserIds.add(team.captainId);
-        team.members.forEach((member) => {
+        team.members.forEach((member: any) => {
           if (member.userId) allUserIds.add(member.userId);
         });
       });

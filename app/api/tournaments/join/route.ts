@@ -100,7 +100,7 @@ export async function POST(req: Request) {
     }
 
     // Create team and deduct coins
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       // Create team
       const team = await tx.team.create({
         data: {

@@ -37,19 +37,19 @@ export async function POST(req: Request) {
     let targetUsers: string[] = [];
     if (targetAudience === "all") {
       const allUsers = await prisma.user.findMany({ select: { id: true } });
-      targetUsers = allUsers.map((u) => u.id);
+      targetUsers = allUsers.map((u: any) => u.id);
     } else if (targetAudience === "players") {
       const players = await prisma.user.findMany({
         where: { role: "user" },
         select: { id: true },
       });
-      targetUsers = players.map((u) => u.id);
+      targetUsers = players.map((u: any) => u.id);
     } else if (targetAudience === "admins") {
       const admins = await prisma.user.findMany({
         where: { role: "admin" },
         select: { id: true },
       });
-      targetUsers = admins.map((u) => u.id);
+      targetUsers = admins.map((u: any) => u.id);
     }
 
     // Create notifications and send pushes to all target users via helper

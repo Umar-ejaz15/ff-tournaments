@@ -14,7 +14,7 @@ export async function GET(req: Request) {
       take: 100,
     });
 
-    return NextResponse.json(items.map(i => ({
+    return NextResponse.json(items.map((i: any) => ({
       ...i,
       createdAt: i.createdAt.toISOString()
     })));

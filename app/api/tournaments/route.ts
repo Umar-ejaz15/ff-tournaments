@@ -23,8 +23,8 @@ export async function GET(req: Request) {
     });
 
     // Calculate total participants for each tournament
-    const tournamentsWithParticipants = tournaments.map((tournament) => {
-      const totalParticipants = tournament.teams.reduce((sum, team) => {
+    const tournamentsWithParticipants = tournaments.map((tournament: any) => {
+      const totalParticipants = tournament.teams.reduce((sum: number, team: any) => {
         return sum + (team.members?.length || 0);
       }, 0);
       

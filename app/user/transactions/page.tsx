@@ -77,7 +77,7 @@ async function TransactionsContent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {user.transactions.map((tx) => (
+                  {user.transactions.map((tx: any) => (
                     <tr key={tx.id} className="border-b border-gray-800 hover:bg-gray-800/30">
                       <td className="py-3 px-4 text-white text-sm">
                         {new Date(tx.createdAt).toLocaleString()}

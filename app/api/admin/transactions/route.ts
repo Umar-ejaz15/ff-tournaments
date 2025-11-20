@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     if (action === "approve") {
       if (tx.status === "approved") return NextResponse.json({ error: "Already approved" }, { status: 400 });
 
-      await prisma.$transaction(async (txdb) => {
+      await prisma.$transaction(async (txdb: any) => {
         await txdb.transaction.update({ where: { id }, data: { status: "approved" } });
         await txdb.wallet.update({ where: { userId: tx.userId }, data: { balance: { increment: tx.amountCoins } } });
       });

@@ -82,7 +82,7 @@ export async function GET(req: Request) {
       },
     });
 
-    const formattedRequests = requests.map((req) => ({
+    const formattedRequests = requests.map((req: any) => ({
       id: req.id,
       subject: req.subject,
       category: req.category,

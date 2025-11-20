@@ -13,7 +13,7 @@ export async function GET() {
       prisma.tournament.count(),
       prisma.transaction.count({ where: { type: "deposit", status: "pending" } }),
       prisma.transaction.count({ where: { type: "withdraw", status: "pending" } }),
-      prisma.wallet.aggregate({ _sum: { balance: true } }).then((r) => r._sum.balance ?? 0),
+      prisma.wallet.aggregate({ _sum: { balance: true } }).then((r: any) => r._sum.balance ?? 0),
     ]);
 
     return NextResponse.json({ usersCount, tournamentsCount, pendingDeposits, pendingWithdrawals, totalBalance });

@@ -37,12 +37,12 @@ export async function GET() {
     });
 
     // Calculate additional stats
-    const leaderboard = users.map((user) => {
+    const leaderboard = users.map((user: any) => {
       // Count unique tournaments the user has participated in
       const uniqueTournaments = new Set(
         user.teams
-          .map((teamMember) => teamMember.team?.tournament?.id)
-          .filter((id): id is string => !!id)
+          .map((teamMember: any) => teamMember.team?.tournament?.id)
+          .filter((id: any): id is string => !!id)
       );
       const tournamentsPlayed = uniqueTournaments.size;
       const totalCoins = user.wallet?.balance || 0;

@@ -82,11 +82,11 @@ export async function POST(req: Request) {
     }
 
     // Validate team size based on mode
-    const requiredSize = {
+    const requiredSize = ({
       Solo: 1,
       Duo: 2,
       Squad: 4,
-    }[tournament.mode];
+    } as any)[tournament.mode as any];
 
     if (members.length !== requiredSize) {
       return NextResponse.json({ 
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
     }
 
     // Create team and register for tournament in a transaction
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Deduct total entry fee (entryFee per player * team size)
       await tx.wallet.update({
         where: { userId: session.user.id },
