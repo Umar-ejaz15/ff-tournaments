@@ -61,8 +61,8 @@ export default function WalletPage() {
       alert("Enter a valid coin amount");
       return;
     }
-    if (amountCoins > 1200) {
-      alert("Maximum withdrawal limit is 1200 coins");
+    if (amountCoins < 1200) {
+      alert("Minimum withdrawal amount is 1200 coins");
       return;
     }
     if (amountCoins > walletBalance) {
@@ -234,12 +234,11 @@ export default function WalletPage() {
                 type="number"
                 value={withAmount}
                 onChange={(e) => setWithAmount(e.target.value)}
-                placeholder="e.g. 250"
+                placeholder="e.g. 1200"
                 className="bg-neutral-800 p-2 rounded-lg outline-none"
-                min={1}
-                max={1200}
+                min={1200}
               />
-              <span className="text-xs text-gray-500">You have {walletBalance} coins (Max: 1200 coins)</span>
+              <span className="text-xs text-gray-500">You have {walletBalance} coins (Min withdrawal: 1200 coins)</span>
             </label>
 
             <label className="flex flex-col gap-1">
@@ -268,10 +267,10 @@ export default function WalletPage() {
             <div className="sm:col-span-2 lg:col-span-3">
               <button
                 type="submit"
-                disabled={withBusy}
-                className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-sm sm:text-base ${withBusy ? "bg-gray-700" : "bg-blue-600 hover:bg-blue-700"}`}
+                disabled={withBusy || walletBalance < 1200}
+                className={`w-full sm:w-auto px-4 py-2 rounded-lg font-semibold text-sm sm:text-base ${withBusy || walletBalance < 1200 ? "bg-gray-700" : "bg-blue-600 hover:bg-blue-700"}`}
               >
-                {withBusy ? "Submitting..." : "Submit Withdrawal Request"}
+                {withBusy ? "Submitting..." : walletBalance < 1200 ? "Need 1200+ coins" : "Submit Withdrawal Request"}
               </button>
             </div>
           </form>

@@ -5,7 +5,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Prisma v7+ no longer supports `url` in schema files.
+  // Move connection settings to `prisma.config.ts` or pass them to PrismaClient per https://pris.ly/d/config-datasource
+  // For local development you can still use environment variables via a Prisma config file.
 }
 
 model User {
@@ -65,6 +67,9 @@ model Tournament {
   gameType        String    @default("BR")
   entryFee        Int
   prizePool       Int
+  prizeTop1       Int?
+  prizeTop2       Int?
+  prizeTop3       Int?
   description     String?
   startTime       DateTime?
   maxParticipants Int?

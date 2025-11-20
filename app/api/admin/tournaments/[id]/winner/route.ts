@@ -47,12 +47,20 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
       );
     }
 
-    // Calculate reward based on actual prize pool and placement
-    // Uses dynamic percentage-based distribution (Top 1: 55%, Top 2: 30%, Top 3: 15%)
-    const rewardCoins = calculatePrizeReward(
-      tournament.prizePool,
-      placement as Placement
-    );
+    // Calculate reward: if tournament has manual top prizes use them, otherwise fall back to percentage calculation
+    let rewardCoins = 0;
+    if (placement === 1 && typeof (tournament as any).prizeTop1 === "number") {
+      rewardCoins = (tournament as any).prizeTop1 as number;
+    } else if (placement === 2 && typeof (tournament as any).prizeTop2 === "number") {
+      rewardCoins = (tournament as any).prizeTop2 as number;
+    } else if (placement === 3 && typeof (tournament as any).prizeTop3 === "number") {
+      rewardCoins = (tournament as any).prizeTop3 as number;
+    } else {
+      rewardCoins = calculatePrizeReward(
+        tournament.prizePool,
+        placement as Placement
+      );
+    }
 
     if (rewardCoins === 0) {
       return NextResponse.json(

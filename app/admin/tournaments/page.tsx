@@ -25,6 +25,9 @@ export default function AdminTournamentsPage() {
     gameType: "BR",
     entryFee: "",
     prizePool: "",
+    prizeTop1: "",
+    prizeTop2: "",
+    prizeTop3: "",
     startTime: "",
     maxParticipants: "",
     lobbyCode: "",
@@ -186,6 +189,39 @@ export default function AdminTournamentsPage() {
               onChange={(e) =>
                 setForm((s) => ({ ...s, prizePool: e.target.value }))
               }
+            />
+          </label>
+
+          <label className="flex flex-col gap-1">
+            <span className="text-sm text-gray-400">Manual Top-1 Prize (optional)</span>
+            <input
+              type="number"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
+              placeholder="e.g. 275"
+              value={form.prizeTop1}
+              onChange={(e) => setForm((s) => ({ ...s, prizeTop1: e.target.value }))}
+            />
+          </label>
+
+          <label className="flex flex-col gap-1">
+            <span className="text-sm text-gray-400">Manual Top-2 Prize (optional)</span>
+            <input
+              type="number"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
+              placeholder="e.g. 150"
+              value={form.prizeTop2}
+              onChange={(e) => setForm((s) => ({ ...s, prizeTop2: e.target.value }))}
+            />
+          </label>
+
+          <label className="flex flex-col gap-1">
+            <span className="text-sm text-gray-400">Manual Top-3 Prize (optional)</span>
+            <input
+              type="number"
+              className="bg-gray-800 border border-gray-700 text-white p-2 rounded-lg"
+              placeholder="e.g. 75"
+              value={form.prizeTop3}
+              onChange={(e) => setForm((s) => ({ ...s, prizeTop3: e.target.value }))}
             />
           </label>
 

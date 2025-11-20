@@ -47,6 +47,9 @@ export async function POST(req: Request) {
         maxParticipants,
         lobbyCode,
         lobbyPassword,
+        prizeTop1,
+        prizeTop2,
+        prizeTop3,
     } = body as any;
 
     if (!title || !mode || !gameType || entryFee === undefined || prizePool === undefined) {
@@ -84,6 +87,9 @@ export async function POST(req: Request) {
         gameType,
         entryFee: entryFeeNum,
         prizePool: prizePoolNum,
+        prizeTop1: prizeTop1 ? Number(prizeTop1) : undefined,
+        prizeTop2: prizeTop2 ? Number(prizeTop2) : undefined,
+        prizeTop3: prizeTop3 ? Number(prizeTop3) : undefined,
         description: description || "",
         startTime: startTime ? new Date(startTime) : null,
         maxParticipants: maxParticipants ? Number(maxParticipants) : null,
@@ -92,6 +98,29 @@ export async function POST(req: Request) {
         lobbyPassword: lobbyPassword ? String(lobbyPassword) : undefined,
       },
     });
+
+    // Notify ALL non-admin users about the new tournament (persist + web-push)
+    try {
+      const users = await prisma.user.findMany({ where: { role: "user" }, select: { id: true } });
+      const userIds = users.map((u) => u.id);
+      const startTimeStr = tournament.startTime ? new Date(tournament.startTime).toLocaleString() : null;
+      if (userIds.length > 0) {
+        await broadcastNotificationToUsers(userIds, {
+          title: "New Tournament Created",
+          body: startTimeStr
+            ? `"${tournament.title}" starts at ${startTimeStr}. Join now!`
+            : `New tournament "${tournament.title}" has been created. Join now!`,
+          data: {
+            tournamentId: tournament.id,
+            tournamentTitle: tournament.title,
+            startTime: tournament.startTime ? tournament.startTime.toString() : null,
+            type: "tournament_new",
+          },
+        });
+      }
+    } catch (notifyErr) {
+      console.warn("Failed to broadcast new tournament notification:", notifyErr);
+    }
 
     return NextResponse.json(tournament);
   } catch (error) {
@@ -119,6 +148,9 @@ export async function PUT(req: Request) {
       "gameType",
       "entryFee",
       "prizePool",
+      "prizeTop1",
+      "prizeTop2",
+      "prizeTop3",
       "description",
       "maxParticipants",
       "lobbyCode",

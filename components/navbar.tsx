@@ -153,9 +153,15 @@ export default function Navbar() {
             {/* Desktop Menu */}
             <div className="hidden lg:flex gap-2 xl:gap-6 flex-nowrap overflow-visible whitespace-nowrap">
               {isAdmin ? (
-                // For admin keep the primary brand link and a single dashboard tab on the left.
+                // For admin show main admin navigation tabs on the left similar to user dashboard
                 <>
                   {navItem("/admin", "Dashboard", <LayoutDashboard className="w-4 h-4" />)}
+                  {navItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
+                  {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
+                  {navItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
+                  {navItem("/admin/support/requests", "Support", <MessageSquare className="w-4 h-4" />)}
+                  {navItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
+                  {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
                 </>
               ) : (
                 <>
@@ -182,17 +188,6 @@ export default function Navbar() {
 
           {/* Right Section */}
           <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
-            {/* Admin links (Desktop, moved to right) */}
-            {isAdmin && (
-              <div className="hidden lg:flex items-center gap-2 xl:gap-3 mr-2">
-                {navItem("/admin/users", "Users", <Users className="w-4 h-4" />)}
-                {navItem("/admin/transactions", "Transactions", <Receipt className="w-4 h-4" />)}
-                {navItem("/admin/tournaments", "Tournaments", <Trophy className="w-4 h-4" />)}
-                {navItem("/admin/support/requests", "Support", <MessageSquare className="w-4 h-4" />)}
-                {navItem("/admin/statistics", "Statistics", <BarChart3 className="w-4 h-4" />)}
-                {navItem("/admin/withdrawals", "Withdrawals", <ArrowDownUp className="w-4 h-4" />)}
-              </div>
-            )}
             {/* Notification Bell */}
             <NotificationBell />
             {/* Admin support new count badge */}

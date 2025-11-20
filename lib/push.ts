@@ -27,19 +27,53 @@ export async function sendWebPush(subscription: any, payload: any) {
 
 export async function sendNotificationToUser(userId: string, payload: { title: string; body: string; data?: any }) {
   // persist notification
+  // Ensure payload.data has a useful url for service worker clicks
+  const dataWithUrl = { ...(payload.data || {}) };
+  if (!dataWithUrl.url) {
+    const t = dataWithUrl.type || payload.data?.type || "general";
+    switch (t) {
+      case "tournament_new":
+      case "start":
+      case "reminder":
+        if (dataWithUrl.tournamentId) dataWithUrl.url = `/user/tournaments/${dataWithUrl.tournamentId}`;
+        break;
+      case "registration":
+        if (dataWithUrl.tournamentId) dataWithUrl.url = `/user/tournaments/${dataWithUrl.tournamentId}`;
+        break;
+      case "prize":
+        if (dataWithUrl.tournamentId) dataWithUrl.url = `/user/tournaments/${dataWithUrl.tournamentId}`;
+        else dataWithUrl.url = "/user/transactions";
+        break;
+      case "withdrawal":
+      case "deposit":
+        dataWithUrl.url = "/user/transactions";
+        break;
+      case "admin":
+      case "announcement":
+        dataWithUrl.url = "/user/notifications";
+        break;
+      default:
+        dataWithUrl.url = "/user/notifications";
+    }
+  }
+
   await prisma.notification.create({
     data: {
       userId,
-      type: payload.data?.type || "general",
+      type: dataWithUrl.type || payload.data?.type || "general",
       message: payload.body,
-      metadata: payload.data ?? null,
+      metadata: dataWithUrl ?? null,
     },
   });
 
   const subs = await prisma.pushSubscription.findMany({ where: { userId } });
   for (const s of subs) {
     const sub = { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } };
-    await sendWebPush(sub, { title: payload.title, body: payload.body, data: payload.data });
+    try {
+      await sendWebPush(sub, { title: payload.title, body: payload.body, data: dataWithUrl });
+    } catch (e) {
+      // sendWebPush already logs; continue
+    }
   }
 }
 
