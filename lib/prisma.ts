@@ -6,10 +6,22 @@ const globalForPrisma = globalThis as unknown as {
   _prisma?: PrismaClient;
 };
 
-// Create a new client or reuse the cached one
-const prisma = globalForPrisma._prisma ?? new PrismaClient({
+// Build Prisma client options. For Prisma v7+, prefer passing an `adapter` with a direct DB URL
+const prismaClientOptions: any = {
   log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-});
+};
+
+if (process.env.DATABASE_URL) {
+  // Pass adapter when a direct DB URL is available.
+  // Use `any` so this file remains compatible with multiple Prisma versions.
+  prismaClientOptions.adapter = {
+    provider: "postgresql",
+    url: process.env.DATABASE_URL,
+  };
+}
+
+// Create a new client or reuse the cached one
+const prisma = globalForPrisma._prisma ?? new (PrismaClient as any)(prismaClientOptions);
 
 // Cache the client in both development and production (important for serverless)
 if (!globalForPrisma._prisma) {
