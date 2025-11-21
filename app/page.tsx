@@ -184,12 +184,7 @@ export default function LandingPage() {
               <p className="text-gray-400 text-sm">Entry: 200 coins</p>
             </div>
           </div>
-          <Link
-            href="/auth/login"
-            className="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition-all inline-flex items-center gap-2 shadow-lg"
-          >
-            Get Started <ArrowRight className="w-5 h-5" />
-          </Link>
+        
         </div>
       </section>
 
