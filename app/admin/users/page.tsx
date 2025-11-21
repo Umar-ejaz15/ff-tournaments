@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Users, Mail, Shield, Wallet, Receipt, Trophy, Calendar, User } from "lucide-react";
+import DeleteUserButton from "@/components/DeleteUserButton";
 
 export default async function AdminUsersPage() {
   const session = await getServerSession(authOptions);
@@ -86,6 +87,12 @@ export default async function AdminUsersPage() {
                       Joined
                     </div>
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                    <div className="flex items-center gap-2">
+                      <span className="w-4 h-4" />
+                      Actions
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800">
@@ -144,6 +151,11 @@ export default async function AdminUsersPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-400">
                         {new Date(user.createdAt).toLocaleDateString()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <DeleteUserButton userId={user.id} disabled={user.id === session.user.id} label={user.name} />
                       </div>
                     </td>
                   </tr>
