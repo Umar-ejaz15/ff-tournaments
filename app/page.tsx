@@ -40,6 +40,8 @@ export default function LandingPage() {
           alt="ZP Battle Zone tournament wallpaper"
           fill
           priority
+          unoptimized
+          sizes="100vw"
           className="object-cover object-center"
         />
 
@@ -120,6 +122,8 @@ export default function LandingPage() {
               alt="Why choose ZP Battle Zone"
               width={920}
               height={260}
+              unoptimized
+              sizes="100vw"
               className="rounded-2xl object-cover mb-6 shadow-2xl"
             />
             <h2 className="text-3xl font-bold text-center text-white">
@@ -153,6 +157,8 @@ export default function LandingPage() {
           src={encodeURI("/tournament ladning page section of prize pool.jpg")}
           alt="Tournament prize pools background"
           fill
+          unoptimized
+          sizes="100vw"
           className="object-cover object-center opacity-30"
         />
         <div className="absolute inset-0 bg-black/55" />
@@ -194,6 +200,8 @@ export default function LandingPage() {
           src={encodeURI("/landing page payment section bg image.webp")}
           alt="payment background"
           fill
+          unoptimized
+          sizes="100vw"
           className="object-cover object-center opacity-20"
         />
         <div className="absolute inset-0 bg-black/60" />
