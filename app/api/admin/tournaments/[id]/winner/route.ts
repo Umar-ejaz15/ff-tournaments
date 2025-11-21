@@ -8,7 +8,10 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     // ✅ Parse params
     const { id } = await context.params;
     const tournamentId = id || new URL(request.url).pathname.split("/").at(-2);
-    const { teamId, placement = 1 } = await request.json();
+    const body = await request.json();
+    const { teamId, placement = 1 } = body;
+    // Optional manual override (admin may provide exact coin amount)
+    const overrideCoinsRaw = body?.rewardCoins;
 
     // ✅ Validate IDs
     if (!tournamentId) {
@@ -49,10 +52,19 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     // Calculate reward based on actual prize pool and placement
     // Uses dynamic percentage-based distribution (Top 1: 55%, Top 2: 30%, Top 3: 15%)
-    const rewardCoins = calculatePrizeReward(
+    let rewardCoins = calculatePrizeReward(
       tournament.prizePool,
       placement as Placement
     );
+
+    // If admin provided a manual override, validate and use it
+    if (overrideCoinsRaw !== undefined && overrideCoinsRaw !== null) {
+      const parsed = Number(overrideCoinsRaw);
+      if (Number.isNaN(parsed) || !Number.isFinite(parsed) || parsed < 0) {
+        return NextResponse.json({ error: "Invalid rewardCoins override" }, { status: 400 });
+      }
+      rewardCoins = Math.floor(parsed);
+    }
 
     if (rewardCoins === 0) {
       return NextResponse.json(

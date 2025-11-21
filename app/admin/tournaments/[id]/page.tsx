@@ -17,6 +17,7 @@ export default function AdminTournamentDetailPage() {
   );
   const [selectedTeamId, setSelectedTeamId] = useState<string>("");
   const [selectedPlacement, setSelectedPlacement] = useState<1 | 2 | 3>(1);
+  const [customCoins, setCustomCoins] = useState<string>("");
   const [busy, setBusy] = useState(false);
 
   const teams = useMemo(() => (data?.teams ?? []) as any[], [data]);
@@ -33,13 +34,23 @@ export default function AdminTournamentDetailPage() {
 
   async function declareWinner(teamId: string, placement: 1 | 2 | 3) {
     const placementText = placement === 1 ? "1st (Top 1)" : placement === 2 ? "2nd (Top 2)" : "3rd (Top 3)";
-    if (!confirm(`Mark this team as ${placementText} and credit prize?`)) return;
+    const confirmMsg = customCoins
+      ? `Mark this team as ${placementText} and credit custom ${customCoins} coins?`
+      : `Mark this team as ${placementText} and credit prize?`;
+    if (!confirm(confirmMsg)) return;
     setBusy(true);
     try {
+      const body: any = { teamId, placement };
+      // If admin entered a custom coin amount, send it as rewardCoins (integer)
+      if (customCoins.trim() !== "") {
+        const parsed = Number(customCoins);
+        if (!Number.isNaN(parsed) && parsed >= 0) body.rewardCoins = Math.floor(parsed);
+      }
+
       const res = await fetch(`/api/admin/tournaments/${params.id}/winner`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teamId, placement }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) {
         const errorText = await res.text();
@@ -48,6 +59,7 @@ export default function AdminTournamentDetailPage() {
       }
       alert(`${placementText} recorded and prize credited.`);
       setSelectedTeamId("");
+      setCustomCoins("");
       mutate();
       router.refresh();
     } finally {
@@ -192,6 +204,16 @@ export default function AdminTournamentDetailPage() {
                             ))}
                           </select>
                         )}
+                          {selectedTeamId === team.id && (
+                            <input
+                              type="number"
+                              min={0}
+                              placeholder="Custom coins (optional)"
+                              className="text-xs bg-gray-800 border border-gray-700 text-white p-1 rounded"
+                              value={selectedTeamId === team.id ? customCoins : ""}
+                              onChange={(e) => setCustomCoins(e.target.value)}
+                            />
+                          )}
                       </div>
                     )}
                   </td>
