@@ -100,6 +100,7 @@ export async function POST(req: Request) {
     }
 
     // Create team and deduct coins
+    let createdTeamId: string | null = null;
     await prisma.$transaction(async (tx) => {
       // Create team
       const team = await tx.team.create({
@@ -148,17 +149,21 @@ export async function POST(req: Request) {
           status: "approved",
         },
       });
-
-      // Notification: Registration Success
-      await tx.notification.create({
-        data: {
-          userId: user.id,
-          type: "registration",
-          message: `You have joined "${tournament.title}" successfully!`,
-          metadata: { tournamentId: tournament.id, teamId: team.id },
-        },
-      });
+      // capture created team id for post-transaction notification
+      createdTeamId = team.id;
     });
+
+    // Send persisted notification + web-push to user after transaction
+    try {
+      const { sendNotificationToUser } = await import("@/lib/push");
+      await sendNotificationToUser(user.id, {
+        title: "Tournament Registration Successful",
+        body: `You have joined "${tournament.title}" successfully!`,
+        data: { tournamentId: tournament.id, teamId: createdTeamId, type: "registration" },
+      });
+    } catch (err) {
+      console.warn("Failed to notify user after tournament join:", err);
+    }
 
     return NextResponse.json({
       success: true,

@@ -46,16 +46,19 @@ export async function POST(req: Request) {
           proofUrl: account ?? undefined,
         },
       });
-
-      await tx.notification.create({
-        data: {
-          userId: user.id,
-          type: "withdrawal",
-          message: `Withdrawal request submitted: Rs. ${amountCoins * 4} via ${method}`,
-          metadata: { amountCoins, method },
-        },
-      });
     });
+
+    // Persisted notification + web-push for the user (outside transaction)
+    try {
+      const { sendNotificationToUser } = await import("@/lib/push");
+      await sendNotificationToUser(user.id, {
+        title: "Withdrawal Request Submitted",
+        body: `Withdrawal request submitted: Rs. ${amountCoins * 4} via ${method}`,
+        data: { amountCoins, method, type: "withdrawal" },
+      });
+    } catch (err) {
+      console.warn("Failed to send withdrawal notification:", err);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

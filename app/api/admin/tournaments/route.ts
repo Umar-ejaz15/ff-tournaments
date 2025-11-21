@@ -98,7 +98,8 @@ export async function POST(req: Request) {
       const users = await prisma.user.findMany({ select: { id: true } });
       const userIds = users.map((u) => u.id);
       if (userIds.length > 0) {
-        await broadcastNotificationToUsers(userIds, {
+        // Fire notifications asynchronously so tournament creation is not blocked
+        broadcastNotificationToUsers(userIds, {
           title: "New Tournament Added",
           body: `${tournament.title} — Join now!`,
           data: {
@@ -106,6 +107,8 @@ export async function POST(req: Request) {
             tournamentTitle: tournament.title,
             type: "new_tournament",
           },
+        }).catch((err) => {
+          console.warn("Async broadcast failed:", err);
         });
       }
     } catch (err) {

@@ -1,6 +1,7 @@
 // app/api/admin/tournaments/[id]/winner/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendPushToUserOnly } from "@/lib/push";
 import { calculatePrizeReward, type Placement } from "@/lib/prize-calculator";
 
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
@@ -76,6 +77,8 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
     const tid = tournamentId as string;
 
     // ✅ Transaction — record winner, update tournament, credit wallet, track wins, check bonuses, and notify
+    const pushJobs: Array<{ userId: string; payload: { title: string; body: string; data?: any } }> = [];
+
     await prisma.$transaction(async (tx) => {
       // Record winner
       await tx.winner.create({
@@ -132,6 +135,14 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
                 message: "🔥 You've won 5 tournaments! +250 bonus coins added.",
               },
             });
+            pushJobs.push({
+              userId: team.captainId,
+              payload: {
+                title: "Bonus awarded",
+                body: "🔥 You've won 5 tournaments! +250 bonus coins added.",
+                data: { type: "bonus", tournamentId: tid },
+              },
+            });
           }
 
           // Bonus Task #2: 15 wins = Star Friend V-Badge eligibility
@@ -147,6 +158,14 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
                      message: "Congratulations! You've won 15 tournaments! You're now eligible for Star Friend V-Badge Prizepool!",
                    },
                  });
+                 pushJobs.push({
+                   userId: team.captainId,
+                   payload: {
+                     title: "Star Friend Eligibility",
+                     body: "Congratulations! You're now eligible for Star Friend V-Badge Prizepool!",
+                     data: { type: "bonus", tournamentId: tid },
+                   },
+                 });
           }
         }
       }
@@ -160,7 +179,22 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
           message: `Congratulations! You placed ${placementText} and won ${rewardCoins} coins in "${tournament.title}"!`,
         },
       });
+      pushJobs.push({
+        userId: team.captainId,
+        payload: {
+          title: `You placed ${placementText}`,
+          body: `Congratulations! You won ${rewardCoins} coins in \"${tournament.title}\"!`,
+          data: { type: "prize", tournamentId: tid },
+        },
+      });
     });
+
+    // After transaction commits, send web-push notifications (non-blocking)
+    if (pushJobs.length > 0) {
+      Promise.allSettled(pushJobs.map((j) => sendPushToUserOnly(j.userId, j.payload))).catch((e) => {
+        console.warn("Failed to send some post-transaction push notifications:", e);
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
