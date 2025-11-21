@@ -88,13 +88,7 @@ export default function LandingPage() {
                 Get Started <ArrowRight className="w-5 h-5" />
               </Link>
 
-              <Link
-                href="/tournaments"
-                className="px-6 md:px-8 py-3 md:py-4 border border-gray-300/10 text-white bg-white/5 hover:bg-white/10 rounded-2xl flex items-center gap-2 transition-all"
-              >
-                Browse Tournaments
-              </Link>
-
+             
            
             </motion.div>
           </div>
