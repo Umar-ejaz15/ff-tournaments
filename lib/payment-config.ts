@@ -19,6 +19,7 @@ export const PAYMENT_METHODS = {
   // Removed JazzCash and Bank - only EasyPaisa and NayaPay are supported now
 } as const;
 
+
 export type PaymentMethod = keyof typeof PAYMENT_METHODS;
 
 /**
