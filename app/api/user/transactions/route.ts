@@ -15,8 +15,9 @@ export async function POST(req: Request) {
     if (!amountCoins || amountCoins <= 0) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
-    if (amountCoins > 1200) {
-      return NextResponse.json({ error: "Maximum withdrawal limit is 1200 coins" }, { status: 400 });
+    // Enforce minimum withdrawal amount of 1200 coins
+    if (amountCoins < 1200) {
+      return NextResponse.json({ error: "Minimum withdrawal amount is 1200 coins" }, { status: 400 });
     }
     const allowed = getAllPaymentMethods().map((m) => m.method);
     if (!method || !allowed.includes(method)) {
