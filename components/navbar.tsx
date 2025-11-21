@@ -2,6 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { 
@@ -68,8 +69,9 @@ export default function Navbar() {
     return (
       <nav className="bg-gray-900 border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 flex justify-between h-16 items-center">
-          <Link href="/" className="text-xl font-bold text-yellow-400">
-            ZP Battle Zone
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="ZP Battle Zone" width={36} height={36} className="object-contain" />
+            <span className="sr-only">ZP Battle Zone</span>
           </Link>
           <div className="flex gap-4">
             <Link
@@ -145,9 +147,10 @@ export default function Navbar() {
           <div className="flex items-center gap-4 sm:gap-8 min-w-0 flex-1">
             <Link
               href={isAdmin ? "/admin" : "/user/player/dashboard"}
-              className="text-lg sm:text-xl font-bold text-yellow-400 truncate"
+              className="flex items-center gap-2"
             >
-              ZP Battle Zone
+              <Image src="/logo.png" alt="ZP Battle Zone" width={40} height={40} className="object-contain" />
+              <span className="sr-only">ZP Battle Zone</span>
             </Link>
 
             {/* Desktop Menu */}

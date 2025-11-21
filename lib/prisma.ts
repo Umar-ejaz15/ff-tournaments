@@ -6,10 +6,57 @@ const globalForPrisma = globalThis as unknown as {
   _prisma?: PrismaClient;
 };
 
-// Create a new client or reuse the cached one
-const prisma = globalForPrisma._prisma ?? new PrismaClient({
+// Build PrismaClient options safely. Newer Prisma builds with engine type
+// "client" may require either an `adapter` or `accelerateUrl` to be
+// provided. Prefer `accelerateUrl` when present; otherwise provide an
+// `adapter` object only when `DATABASE_URL` is available.
+const prismaClientOptions: any = {
   log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-});
+};
+
+// If an accelerate URL is provided (Prisma Accelerate), use it.
+if (process.env.PRISMA_ACCELERATE_URL) {
+  prismaClientOptions.accelerateUrl = process.env.PRISMA_ACCELERATE_URL;
+}
+
+// Only provide an `adapter` option for Prisma Client v7+ or when explicitly
+// requested. Older Prisma Client versions (v6.x) do not expect an adapter
+// shape like `{ provider, url }` and may attempt to call adapter.connect,
+// which will fail if the adapter is a plain object. We try to read the
+// installed `@prisma/client` version at runtime and only attach the adapter
+// when the major version is 7 or higher.
+if (!prismaClientOptions.accelerateUrl && process.env.DATABASE_URL) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
+    const clientPkg = require("@prisma/client/package.json");
+    const clientVersion: string | undefined = clientPkg?.version;
+    const major = clientVersion ? parseInt(clientVersion.split(".")[0], 10) : NaN;
+    if (!Number.isNaN(major) && major >= 7) {
+      prismaClientOptions.adapter = {
+        provider: "postgresql",
+        url: process.env.DATABASE_URL,
+      };
+    }
+  } catch (err) {
+    // If we couldn't read the installed client version, err on the side of
+    // not providing the adapter to avoid accidental runtime errors.
+    // eslint-disable-next-line no-console
+    console.warn("Could not determine @prisma/client version; skipping adapter option.", err);
+  }
+}
+
+// Create a new client or reuse the cached one
+let prisma: PrismaClient;
+try {
+  prisma = globalForPrisma._prisma ?? new PrismaClient(prismaClientOptions);
+} catch (e) {
+  // Provide a clear, actionable log for the developer
+  // Do not crash here silently; rethrow after logging to make the error visible
+  // in the dev console.
+  // eslint-disable-next-line no-console
+  console.error("PrismaClient construction failed. Options:", prismaClientOptions, "Error:", e);
+  throw e;
+}
 
 // Cache the client in both development and production (important for serverless)
 if (!globalForPrisma._prisma) {

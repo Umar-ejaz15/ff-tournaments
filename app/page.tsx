@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { ArrowRight, Trophy, Users, Coins } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -31,55 +32,106 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white">
-      {/* --- Hero Section --- */}
-      <section className="flex flex-col items-center justify-center text-center py-32 px-6">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-5xl md:text-7xl font-extrabold mb-6 text-yellow-400"
-        >
-          ZP Battle Zone Championship 2025
-        </motion.h1>
+      
+      {/* --- Hero Section with background image --- */}
+      <section className="relative h-[90vh] min-h-[520px] flex items-center">
+        <Image
+          src="/hero.jpg"
+          alt="ZP Battle Zone tournament wallpaper"
+          fill
+          priority
+          className="object-cover object-center"
+        />
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-gray-300 max-w-3xl text-xl mb-4"
-        >
-          Join the ultimate ZP Battle Zone tournament platform. Compete in Solo, Duo, and Squad battles.
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-gray-400 max-w-3xl text-lg mb-12"
-        >
-          Win real prizes, earn coins, and climb the leaderboard!
-        </motion.p>
+        {/* dark gradient overlay to keep text readable */}
+        <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/45 to-black/70" />
 
+        <div className="relative z-10 w-full px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-4 leading-tight text-yellow-400 drop-shadow-[0_6px_12px_rgba(0,0,0,0.8)]"
+            >
+              ZP Battle Zone Championship 2025
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.25 }}
+              className="text-gray-200 max-w-3xl mx-auto text-lg md:text-xl mb-4"
+            >
+              Join the ultimate ZP Battle Zone tournament platform. Compete in Solo, Duo, and Squad battles — win real prizes and climb the leaderboard.
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35 }}
+              className="text-gray-400 max-w-2xl mx-auto text-sm md:text-base mb-6"
+            >
+              Fast matchmaking, transparent coin handling, and verified payouts — built for competitive players who want results.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="flex flex-wrap gap-4 justify-center"
+            >
+              <Link
+                href="/auth/login"
+                className="px-8 md:px-10 py-4 md:py-5 bg-linear-to-r from-yellow-500 to-yellow-400 text-black font-bold rounded-2xl flex items-center gap-3 transition-all shadow-2xl"
+              >
+                Get Started <ArrowRight className="w-5 h-5" />
+              </Link>
+
+              <Link
+                href="/tournaments"
+                className="px-6 md:px-8 py-3 md:py-4 border border-gray-300/10 text-white bg-white/5 hover:bg-white/10 rounded-2xl flex items-center gap-2 transition-all"
+              >
+                Browse Tournaments
+              </Link>
+
+           
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Decorative animated trophy/coin */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="flex flex-wrap gap-4 justify-center"
+          transition={{ delay: 0.6 }}
+          className="absolute right-8 bottom-8 hidden md:flex items-center gap-3"
+          style={{ pointerEvents: "none" }}
         >
-          <Link
-            href="/auth/login"
-            className="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/40"
-          >
-            Get Started <ArrowRight className="w-5 h-5" />
-          </Link>
+          <div className="w-20 h-20 rounded-full bg-linear-to-br from-yellow-400 to-yellow-600 flex items-center justify-center border border-yellow-200 shadow-xl">
+            <Trophy className="w-8 h-8 text-white" />
+          </div>
+          <div className="w-14 h-14 rounded-full bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center border border-indigo-300 shadow-lg">
+            <Coins className="w-6 h-6 text-white" />
+          </div>
         </motion.div>
       </section>
 
       {/* --- Features Section --- */}
-      <section className="py-24 px-6 bg-gray-950 border-t border-gray-800">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12 text-white">
-            Why Choose ZP Battle Zone?
-          </h2>
+      <section className="min-h-[60vh] md:h-auto py-10 flex items-center px-6 bg-gray-950 border-t border-gray-800">
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="flex flex-col items-center mb-12">
+            <Image
+              src="/whychoseeus.jpg"
+              alt="Why choose ZP Battle Zone"
+              width={920}
+              height={260}
+              className="rounded-2xl object-cover mb-6 shadow-2xl"
+            />
+            <h2 className="text-3xl font-bold text-center text-white">
+              Why Choose ZP Battle Zone?
+            </h2>
+          </div>
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <FeatureCard
               icon={<Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-4" />}
@@ -101,8 +153,16 @@ export default function LandingPage() {
       </section>
 
       {/* --- Prize Pool Section --- */}
-      <section className="py-24 px-6 bg-linear-to-b from-black via-gray-900 to-black">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative min-h-[60vh] md:h-[90vh] px-6 bg-linear-to-b from-black via-gray-900 to-black">
+        {/* Background image for prize pool section */}
+        <Image
+          src={encodeURI("/tournament ladning page section of prize pool.jpg")}
+          alt="Tournament prize pools background"
+          fill
+          className="object-cover object-center opacity-30"
+        />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="relative max-w-4xl mx-auto text-center z-10 flex flex-col items-center justify-center h-full">
           <h2 className="text-4xl font-bold mb-8 text-yellow-400">Tournament Prize Pools</h2>
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
@@ -134,8 +194,16 @@ export default function LandingPage() {
       </section>
 
       {/* --- Payment Methods Section --- */}
-      <section className="py-20 px-6 bg-gray-950 border-t border-gray-800">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative min-h-[60vh] md:h-[90vh] px-6 bg-gray-950 border-t border-gray-800">
+        {/* Payment section background image */}
+        <Image
+          src={encodeURI("/landing page payment section bg image.webp")}
+          alt="payment background"
+          fill
+          className="object-cover object-center opacity-20"
+        />
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="relative max-w-4xl mx-auto text-center z-10 flex flex-col items-center justify-center h-full">
           <h2 className="text-3xl font-bold mb-6 text-white">Easy Payment Options</h2>
           <p className="text-gray-400 mb-8">
             Support for multiple payment methods. Simply send payment, upload proof, and get verified!
@@ -169,8 +237,10 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon, title, desc }: FeatureCardProps) {
   return (
-    <div className="bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-yellow-500/50 transition-all">
-      {icon}
+    <div className="bg-gray-900 p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-yellow-500/50 transition-all flex flex-col items-center text-center">
+      <div className="w-20 h-20 rounded-full bg-yellow-500/10 flex items-center justify-center mb-4 border border-yellow-500/20">
+        <div className="w-10 h-10 text-yellow-400">{icon}</div>
+      </div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-gray-400 text-sm">{desc}</p>
     </div>

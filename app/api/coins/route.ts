@@ -23,6 +23,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Invalid amounts" }, { status: 400 });
     }
 
+    // Require payment proof for deposits
+    if (!proofUrl) {
+      return NextResponse.json({ message: "Payment proof (proofUrl) is required" }, { status: 400 });
+    }
+
     // create pending transaction
     const user = await prisma.user.findUnique({ where: { email: session.user.email }});
     if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });

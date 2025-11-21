@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn, useSession } from "next-auth/react";
+import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
@@ -156,13 +157,25 @@ function LoginForm() {
       </div>
     );
   }
-
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8 bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 shadow-2xl">
+    <div className="min-h-screen relative text-white flex items-center justify-center px-4 py-12">
+      {/* Full page background image (file has spaces; encoded path used) */}
+      <Image
+        src={encodeURI("/login page and sign up page background image for full page.jpg")}
+        alt="auth background"
+        fill
+        priority
+        className="object-cover opacity-60"
+      />
+      <div className="absolute inset-0 bg-linear-to-b from-black/80 via-black/65 to-black/80" />
+
+      <div className="relative w-full max-w-md space-y-8 bg-gray-900/60 backdrop-blur-md border border-gray-800 rounded-2xl p-8 shadow-2xl">
+        <div className="flex items-center justify-center">
+          <Image src="/logo.png" alt="logo" width={56} height={56} />
+        </div>
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
-          <p className="text-gray-400">Sign in to your account</p>
+          <p className="text-gray-300">Sign in to your account</p>
         </div>
 
         {error && (

@@ -93,6 +93,25 @@ export async function POST(req: Request) {
       },
     });
 
+    // Broadcast new tournament to all users (non-blocking; failures won't break creation)
+    try {
+      const users = await prisma.user.findMany({ select: { id: true } });
+      const userIds = users.map((u) => u.id);
+      if (userIds.length > 0) {
+        await broadcastNotificationToUsers(userIds, {
+          title: "New Tournament Added",
+          body: `${tournament.title} — Join now!`,
+          data: {
+            tournamentId: tournament.id,
+            tournamentTitle: tournament.title,
+            type: "new_tournament",
+          },
+        });
+      }
+    } catch (err) {
+      console.warn("Failed to broadcast new tournament notification:", err);
+    }
+
     return NextResponse.json(tournament);
   } catch (error) {
     console.error("❌ Error creating tournament:", error);

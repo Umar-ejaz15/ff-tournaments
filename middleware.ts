@@ -46,6 +46,14 @@ export default withAuth(
           "/auth/callback/google",
         ];
 
+        // Allow API routes and Next.js internals so client fetches (session/csrf)
+        // are not redirected to HTML pages when unauthenticated. This prevents
+        // `next-auth` client requests from receiving an HTML login page which
+        // causes the `Unexpected token '<' ... is not valid JSON` error.
+        const pathname = req.nextUrl.pathname;
+        if (pathname.startsWith("/api")) return true;
+        if (pathname.startsWith("/_next")) return true;
+
         // If route is public, allow access
         if (publicRoutes.includes(req.nextUrl.pathname)) {
           return true;

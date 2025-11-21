@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -159,8 +160,16 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-gray-900 via-black to-gray-900 text-white flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8 bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 shadow-2xl">
+    <div className="min-h-screen relative text-white flex items-center justify-center px-4 py-12">
+      <Image
+        src={encodeURI("/login page and sign up page background image for full page.jpg")}
+        alt="signup background"
+        fill
+        className="object-cover opacity-60"
+      />
+      <div className="absolute inset-0 bg-linear-to-b from-black/80 via-black/65 to-black/80" />
+
+      <div className="relative w-full max-w-md space-y-8 bg-gray-900/60 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 shadow-2xl">
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-2">Create Account</h1>
           <p className="text-gray-400">Sign up to get started</p>
