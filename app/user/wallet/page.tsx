@@ -61,8 +61,8 @@ export default function WalletPage() {
       alert("Enter a valid coin amount");
       return;
     }
-    if (amountCoins > 1200) {
-      alert("Maximum withdrawal limit is 1200 coins");
+    if (amountCoins < 1200) {
+      alert("Minimum withdrawal amount is 1200 coins");
       return;
     }
     if (amountCoins > walletBalance) {
@@ -234,12 +234,11 @@ export default function WalletPage() {
                 type="number"
                 value={withAmount}
                 onChange={(e) => setWithAmount(e.target.value)}
-                placeholder="e.g. 250"
+                placeholder="e.g. 1200"
                 className="bg-neutral-800 p-2 rounded-lg outline-none"
-                min={1}
-                max={1200}
+                min={1200}
               />
-              <span className="text-xs text-gray-500">You have {walletBalance} coins (Max: 1200 coins)</span>
+              <span className="text-xs text-gray-500">You have {walletBalance} coins (Min: 1200 coins)</span>
             </label>
 
             <label className="flex flex-col gap-1">

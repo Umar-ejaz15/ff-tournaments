@@ -49,3 +49,27 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user || session.user.role !== "admin") return unauthorized();
+
+    const body = await req.json();
+    const { id } = body as { id?: string };
+    if (!id) return NextResponse.json({ error: "Missing user id" }, { status: 400 });
+
+    // Prevent deleting self (optional safety)
+    if (session.user.id === id) {
+      return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
+    }
+
+    // Attempt to delete the user. If there are foreign key constraints,
+    // the database/prisma will return an error — handle gracefully.
+    const deleted = await prisma.user.delete({ where: { id } });
+    return NextResponse.json({ success: true, deletedId: deleted.id });
+  } catch (error) {
+    console.error("DELETE /api/admin/users error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

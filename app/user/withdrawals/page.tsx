@@ -36,7 +36,7 @@ export default function UserWithdrawalsPage() {
     e.preventDefault();
     const amountCoins = Number(amount);
     if (!amountCoins || amountCoins <= 0) return alert("Enter valid amount");
-    if (amountCoins > 1200) return alert("Maximum withdrawal limit is 1200 coins");
+    if (amountCoins < 1200) return alert("Minimum withdrawal amount is 1200 coins");
     if ((wallet?.balance ?? 0) < amountCoins) return alert("Insufficient balance");
     if (!account.trim()) return alert("Enter account/number");
     setBusy(true);
@@ -70,8 +70,8 @@ export default function UserWithdrawalsPage() {
           <form onSubmit={submit} className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <label className="flex flex-col gap-1">
               <span className="text-sm text-gray-400">Amount (coins)</span>
-              <input className="bg-gray-800 p-2 rounded-lg" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} min={1} max={1200} />
-              <span className="text-xs text-gray-500">Max: 1200 coins</span>
+              <input className="bg-gray-800 p-2 rounded-lg" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} min={1200} />
+              <span className="text-xs text-gray-500">Min: 1200 coins</span>
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-sm text-gray-400">Method</span>
