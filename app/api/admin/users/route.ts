@@ -73,7 +73,7 @@ export async function DELETE(req: Request) {
 
     // Find teams where the user is captain so we can clean up related winners and teams
     const teams = await prisma.team.findMany({ where: { captainId: userId }, select: { id: true } });
-    const teamIds = teams.map((t) => t.id);
+    const teamIds = teams.map((t: { id: string }) => t.id);
 
     const ops: any[] = [];
 
